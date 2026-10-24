@@ -1,0 +1,306 @@
+.m_shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--primary-bg-color);
+  color: var(--text-color);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m_topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--tertiary-bg-color);
+}
+.m_back { font-size: 1.6rem; padding: 0.1rem 0.9rem; }
+.m_title {
+  flex: 1; min-width: 0;
+  color: var(--title-accent-color);
+  font-size: 1.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.m_content { flex: 1; min-height: 0; overflow-y: auto; }
+
+.m_list_item {
+  padding: 1rem 1.25rem;
+  font-size: 1.3rem;
+  border-bottom: 1px solid var(--tertiary-bg-color);
+  cursor: pointer;
+}
+.m_item_sub { color: grey; font-size: 1rem; }
+.m_empty { padding: 2rem; text-align: center; color: grey; }
+
+.m_tabbar { display: flex; flex-shrink: 0; background-color: var(--tertiary-bg-color); }
+.m_tab {
+  flex: 1;
+  padding: 0.9rem 0;
+  border: none;
+  border-top: 0.2rem solid transparent;
+  background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  letter-spacing: inherit;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+.m_tab_active { color: var(--playlist-accent-color); border-top-color: var(--playlist-accent-color); }
+
+.m_player { display: flex; flex-direction: column; height: 100%; padding: 1.5rem 1.25rem; }
+.m_visualizer { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.m_now_playing { min-height: 3.5rem; margin-bottom: 0.5rem; text-align: center; }
+.m_song_name, .m_song_artist { overflow-wrap: anywhere; }
+.m_song_name { color: var(--song-name-accent-color); font-size: 1.5rem; }
+.m_song_artist { color: grey; }
+.m_controls_main { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+.m_controls_main .app_button { padding: 0.8rem 0; flex: 1; max-width: 4rem; }
+.m_controls_main .m_play { max-width: 5rem; }
+.m_controls_secondary { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 1rem 0 1.5rem; }
+
+.m_settings { padding: 1rem 1.25rem; }
+.m_setting_row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.m_select { min-width: 10rem; border-radius: 4px; font-family: inherit; letter-spacing: inherit; }
+.m_select option { background-color: var(--tertiary-bg-color); color: var(--text-color); }
+
+.m_playlist_item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+}
+.m_cover {
+  flex-shrink: 0;
+  width: 4rem;
+  height: 4rem;
+  background-color: var(--tertiary-bg-color);
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+}
+.m_cover_small { width: 2.75rem; height: 2.75rem; }
+.m_playlist_text { min-width: 0; }
+.m_playlist_name {
+  font-size: 1.3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.m_miniplayer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  margin: 0.5rem 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--secondary-bg-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+.m_mini_text { flex: 1; min-width: 0; line-height: 1.2rem; }
+.m_mini_name, .m_mini_artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.m_mini_name { color: var(--song-name-accent-color); }
+.m_mini_artist { color: grey; font-size: 0.9rem; }
+.m_mini_controls { display: flex; gap: 0.25rem; }
+.m_mini_btn {
+  min-width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  color: var(--buttons-accent-color);
+}
+
+/* content area + floating button */
+.m_content_wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.m_content_fab { padding-bottom: 5.5rem; }   /* last row can scroll clear of the + */
+.m_fab {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--playlist-accent-color);
+  color: var(--primary-bg-color);
+  font-family: inherit;
+  font-size: 2rem;
+  letter-spacing: 0;
+  line-height: 1;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+.m_fab:hover { background-color: var(--playlist-accent-color); }
+
+/* rows */
+.m_row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;   /* no text-selection popup on long-press */
+}
+.m_row_text, .m_playlist_text { flex: 1; min-width: 0; }
+.m_playlist_item { gap: 1rem; }
+.m_kebab {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 1.6rem;
+  letter-spacing: 0;
+  color: var(--text-color);
+}
+.m_kebab:hover { background: transparent; }
+
+/* sheets and dialogs */
+.m_overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.m_overlay_center { align-items: center; justify-content: center; }
+.m_sheet {
+  width: 100%;
+  max-height: 70%;
+  overflow-y: auto;
+  background-color: var(--tertiary-bg-color);
+  border-top: 0.2rem solid var(--playlist-accent-color);
+  padding: 0.5rem 0 calc(0.5rem + max(env(safe-area-inset-bottom), var(--inset-bottom, 0px)));
+}
+.m_sheet_title {
+  padding: 0.75rem 1.25rem;
+  color: var(--playlist-accent-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.m_sheet_btn {
+  display: block;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+  font-family: inherit;
+  letter-spacing: inherit;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+.m_sheet_btn:hover { background: transparent; }
+.m_sheet_danger { color: #ff4848; }
+
+.m_dialog {
+  width: calc(100% - 3rem);
+  max-width: 24rem;
+  padding: 1.25rem;
+  background-color: var(--tertiary-bg-color);
+  border-top: 0.2rem solid var(--playlist-accent-color);
+}
+.m_dialog_input { width: 100%; margin: 0.5rem 0 1rem; background-color: var(--primary-bg-color); }
+.m_dialog_buttons { display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+.m_importing {
+  position: absolute;
+  left: 1.25rem;
+  bottom: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: var(--tertiary-bg-color);
+  color: var(--playlist-accent-color);
+}
+
+.m_fab_left {
+  right: auto;
+  left: 1.25rem;
+}
+
+.m_header_btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 1.4rem;
+  padding: 0.1rem 0.9rem;
+  letter-spacing: 0;
+}
+
+/* the "Importing…" label used the bottom-left corner, which the "‹" button now occupies */
+.m_importing {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.m_back, .m_header_btn, .m_fab, .m_kebab, .m_mini_btn, .m_icon_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 1.25rem margin + 3.5rem button + 1rem gap */
+.m_fab_beside { right: 5.75rem; }
+.m_checkbox { width: 1.6rem; height: 1.6rem; accent-color: var(--playlist-accent-color); }
+
+.m_picker {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--primary-bg-color);
+  padding: max(env(safe-area-inset-top), var(--inset-top, 0px)) 0 max(env(safe-area-inset-bottom), var(--inset-bottom, 0px));
+}
+.m_picker_list { flex: 1; min-height: 0; overflow-y: auto; }
+.m_picker_row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--tertiary-bg-color);
+}
+.m_picker_name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m_picker_footer { padding: 0.75rem 1.25rem; background-color: var(--tertiary-bg-color); }
+.m_picker_footer .app_button:disabled { opacity: 0.4; }
+
+.m_picker_tools { flex-shrink: 0; padding: 0 1.25rem; }
+.m_search { width: 100%; margin-bottom: 0.25rem; background-color: var(--tertiary-bg-color); }
+.m_select_all { padding-left: 0; padding-right: 0; }
+
+.m_update {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: 0.5rem 1.25rem;
+  background-color: var(--playlist-accent-color);
+  color: var(--primary-bg-color);
+}
+.m_update_text { flex: 1; min-width: 0; }
+.m_update .app_button { color: var(--text-color); }

@@ -1,0 +1,136 @@
+.cursor{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--list-accent-color);
+  transition: transform 0.05s ease-out;
+}
+
+.cursor_list_wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+}
+
+.cursor_list_scroll {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--list-accent-color) transparent;
+}
+
+.cursor_list_inner{
+    position: relative;
+    width: 100%;
+}
+
+.cursor_list{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    margin-top: 0rem;
+    width: 100%;
+}
+
+.new_label_input{
+    height: 1rem;
+    width: 12rem;
+}
+
+.rendered_item{
+    padding-left: 1.5rem;
+}
+
+.cursor_list .rendered_item {
+    cursor: pointer;
+    position: relative;   /* anchor for the drag handle */
+}
+
+/* drag mode: only the mouse cursor changes, the layout stays exactly the same */
+.drag_mode .cursor_list .rendered_item {
+    cursor: grab;
+}
+.is_dragging .cursor_list .rendered_item {
+    cursor: grabbing;
+}
+.drag_mode,
+.is_dragging {
+    user-select: none;
+}
+
+/* a row = the item's content + the ⋮ button on the far right */
+.cursor_row {
+    display: flex;
+    align-items: flex-start;   /* the ⋮ sits level with the first line, i.e. the title */
+    align-self: stretch;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.cursor_row_content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* keeps row heights identical to before (".playlist_list div" adds a top margin to every div) */
+.playlist_list .cursor_row_content {
+    margin-top: 0;
+}
+
+.item_menu_button {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 1.5rem;
+    margin-top: 0.1rem;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+    color: grey;
+    background: transparent;
+    opacity: 0;
+}
+
+/* two classes beat the global "button:hover" rule in App.css */
+.item_menu_button:hover {
+    background-color: transparent;
+    color: var(--list-accent-color);
+}
+
+/* shown only while the row is hovered */
+.cursor_row:hover .item_menu_button,
+.cursor_row.menu_open .item_menu_button {
+    opacity: 1;
+}
+
+/* hidden instead of removed, so the row keeps its size while the handle shows */
+.item_menu_button_hidden {
+    visibility: hidden;
+}
+
+/* the drag handle takes the ⋮ slot on the right: absolute = takes no space, moves nothing */
+.drag_handle {
+    position: absolute;
+    right: 0;
+    top: 0.1rem;
+    width: 2rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+    letter-spacing: 0;
+    color: var(--list-accent-color);
+    pointer-events: none;   /* the press goes through to the row, which starts the drag */
+}

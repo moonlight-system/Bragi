@@ -1,0 +1,32 @@
+.editable_label {
+    display: block;
+    position: relative;           /* anchor for the textarea */
+}
+
+/* invisible copy of the text: it alone decides the size, like the label it replaces */
+.editable_label_sizer {
+    display: block;
+    visibility: hidden;
+    white-space: pre-wrap;        /* wraps like normal text, but keeps spaces */
+    overflow-wrap: break-word;
+}
+
+.editable_label_input {
+    position: absolute;           /* overlays the sizer, can't push anything */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    resize: none;                 /* no drag handle */
+    overflow: hidden;             /* no scrollbar (it would shrink the text width) */
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    white-space: pre-wrap;        /* same wrapping rules as the sizer */
+    overflow-wrap: break-word;
+}

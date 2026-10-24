@@ -1,0 +1,39 @@
+.context_menu_cover {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+}
+
+.context_menu {
+    position: fixed;
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+    min-width: 14rem;
+    padding: 0.3rem;
+    font-size: 1rem;
+    background-color: var(--tertiary-bg-color);
+    border-top: 0.2rem solid var(--playlist-accent-color);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.5);
+}
+
+.context_menu_item {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    text-align: left;
+    font: inherit;
+    letter-spacing: inherit;
+    color: var(--text-color);
+    background: transparent;
+    cursor: pointer;
+}
+
+/* two classes beat the global "button:hover" rule in App.css */
+.context_menu_item:hover {
+    background-color: var(--primary-bg-color);
+    color: var(--playlist-accent-color);
+}
+
+.context_menu_item_danger:hover {
+    color: #ff4848;
+}

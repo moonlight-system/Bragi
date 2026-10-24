@@ -1,0 +1,37 @@
+.progress_bar_row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.progress_track {
+    position: relative;
+    flex: 1;
+    height: 0.75rem;
+    background-color: var(--tertiary-bg-color);
+    cursor: pointer;
+    touch-action: none;   /* a finger on the bar drags it instead of scrolling the page */
+}
+
+/* invisible, taller click zone: the bar itself is only 0.75rem high */
+.progress_track::before {
+    content: "";
+    position: absolute;
+    inset: -0.6rem 0;
+}
+
+.progress_fill {
+    height: 100%;
+    background-color: var(--progress-accent-color);
+    /* smooths over the ~4 updates per second from timeupdate */
+    transition: width 0.25s linear;
+}
+
+.progress_time {
+    min-width: 3rem;
+    text-align: center;
+}
+
+/* no smoothing while dragging, or the fill lags behind the pointer */
+.progress_fill_dragging { transition: none; }

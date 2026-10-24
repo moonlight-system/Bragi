@@ -1,0 +1,303 @@
+.home_screen_container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    height: 100%;
+    background-color: var(--primary-bg-color);
+}
+
+.bragi_title{
+    color: var(--title-accent-color);
+    background-color: var(--tertiary-bg-color);
+    font-size: clamp(2rem, 6vh, 4rem);
+    line-height: 1.5;
+    letter-spacing: 0.4rem;
+    margin-top: 0rem;
+    margin-bottom: 1rem;
+    margin-left: 0rem;
+    padding-left: 2rem;
+    letter-spacing: 0.5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 1rem;
+}
+
+.title_settings_button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--title-accent-color);
+}
+
+/* two classes beat the global "button:hover" rule in App.css */
+.title_settings_button:hover {
+    background: transparent;
+    color: var(--text-color);
+}
+
+.horizontal_panels .playlist_list {
+    flex: 1;
+    min-height: 15rem;
+}
+
+.song_list_placeholder {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: grey;
+}
+
+.horizontal_panels {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.panel {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.panel:first-child{
+    background-color: var(--tertiary-bg-color);
+    width: clamp(14rem, 22vw, 25rem);
+}
+.song_panel{
+    background-color: var(--secondary-bg-color);
+    width: clamp(16rem, 26vw, 30rem);
+}
+
+/* each panel tells the cursor lists inside it which color to use for the ">" and the scrollbar */
+.playlist_panel,
+.copy_picker {
+    --list-accent-color: var(--playlist-accent-color);
+}
+.song_panel {
+    --list-accent-color: var(--songs-accent-color);
+}
+
+.main_player{
+    background-color: var(--primary-bg-color);
+    flex: 1;
+    min-width: 20rem;
+}
+
+.panel_placeholder {
+    flex: 1;
+    display: flex;
+    color: grey;
+    text-align: center;
+    padding: 1rem;
+}
+
+.panel .playlist_list {
+    flex: 1;
+    min-height: 0;
+}
+
+.home_screen_container .playlist_list,
+.home_screen_container .playlist_list .cursor_list{
+    align-items: flex-start;
+}
+
+.playlist_list {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 1rem;
+}
+
+.playlist_list input{
+    background-color: var(--primary-bg-color);
+}
+
+.playlist_list div{
+    font-size: 1.5rem;
+    margin-top: 0.1rem;
+}
+
+.keybinds_footer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    align-self: stretch;
+    max-height: 14rem;
+    font-size: 1rem;
+    color: grey;
+}
+
+.copy_picker_overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.copy_picker {
+    display: flex;
+    flex-direction: column;
+    min-width: 20rem;
+    max-height: 70%;
+    padding: 1.5rem;
+    background-color: var(--tertiary-bg-color);
+    border-top: 0.2rem solid var(--playlist-accent-color);
+}
+
+.copy_picker_title {
+    margin-bottom: 1rem;
+    color: var(--playlist-accent-color);
+}
+
+.player_controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.player_controls .app_button:nth-child(3){
+    width: 6rem;
+}
+.player_controls .app_button:nth-child(5){
+    margin-right: 3rem;
+}
+
+.player_song_name{
+    color: var(--song-name-accent-color);
+    font-size: 1.5rem;
+}
+.player_artist_name{
+    color: grey;
+}
+
+
+
+.visualizer_area {
+    flex: 1;              /* takes all the space left above the group */
+    min-height: 0;
+    display: flex;
+    align-items: center;  /* vertical centering */
+    justify-content: center;
+}
+
+.player_group {
+    flex-shrink: 0;
+    margin-bottom: 3rem;
+}
+
+.now_playing {
+    min-height: 3rem;     /* two text lines: reserved even when nothing plays */
+}
+
+.now_playing > div {
+    white-space: nowrap;  /* a long title gets "..." instead of wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song_artist_name{
+    font-size: 1rem !important;
+}
+
+[data-show-keybinds="false"] .keybinds_footer {
+    display: none;
+}
+
+.player_playlist_name {
+    color: var(--playlist-accent-color);
+    font-size: 2rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.add_button {
+    align-self: flex-start;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 4px;
+    border: none;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: 0;
+    color: var(--tertiary-bg-color);   /* the + is a dark/light cut-out on the colored square */
+    background-color: var(--button-color);
+}
+
+/* the same color, 15% darker (two classes beat the global "button:hover" in App.css) */
+.add_button:hover {
+    background-color: color-mix(in srgb, var(--button-color) 85%, black);
+}
+
+/* thin scrollbar on the LEFT of the playlists / songs lists, drawn in the panel's padding */
+.horizontal_panels .cursor_list_scroll {
+    direction: rtl;                  /* moves the scrollbar to the left */
+    scrollbar-gutter: stable;        /* its width is always reserved: nothing shifts when it appears */
+    margin-left: -1.1rem;              /* same as the panel's padding: the container now starts at the panel's very edge */
+    width: calc(100% + 1rem);
+    padding-left: calc(1rem - 6px);
+    /* "auto" is needed: the ::-webkit-scrollbar rules below are ignored if these are set to anything else
+       (this also overrides the "thin" / accent color set in CursorList.css) */
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+    margin-top: -1.2rem;               /* same as the panel's padding: the container now starts at the panel's top edge */
+    padding-top: 1.2rem;               /* gives the space back, so the first row stays where it was */
+    scroll-padding-top: 1.2rem;
+}
+
+.horizontal_panels .cursor_list_inner {
+    direction: ltr;                  /* the content itself stays left-to-right */
+}
+
+.horizontal_panels .cursor_list_scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.horizontal_panels .cursor_list_scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.horizontal_panels .cursor_list_scroll::-webkit-scrollbar-thumb {
+    background-color: var(--list-accent-color);
+    border-radius: 2px;
+}
+
+.horizontal_panels .new_label {
+    position: relative;
+    z-index: 1;
+    background-color: var(--tertiary-bg-color);   /* the playlists panel's background */
+}
+
+.playlist_panel,
+.song_panel {
+    padding-top: 1.2rem;
+}
+
+/* ANYTHING AFTER THIS LINE IS FOR MOBILE ONLY */
+
+[data-platform="mobile"] .keybinds_footer {
+  display: none;
+}

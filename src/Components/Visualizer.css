@@ -1,0 +1,6 @@
+.visualizer_canvas {
+    display: block;
+    width: 100%;
+    height: auto;              /* keeps the canvas's own aspect ratio */
+    image-rendering: pixelated; /* crisp blocks instead of blurry scaling */
+}
