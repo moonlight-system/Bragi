@@ -10,7 +10,7 @@ import type { Playlist, Song, UserPreferences } from './types_and_functions';
 import { usePlayer } from './usePlayer';
 import { isAndroid, newId } from './types_and_functions';
 import { MobileShell } from './Components/Mobile/MobileShell';
-import { applyFont, DEFAULT_FONT, applyFontSize, DEFAULT_FONT_SIZE } from './fonts';
+import { applyFont, DEFAULT_FONT, applyFontSize, DEFAULT_FONT_SIZE, applyLetterSpacing, DEFAULT_LETTER_SPACING } from './fonts';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<"HomeScreen" | "SettingsScreen">("HomeScreen");
@@ -142,6 +142,14 @@ function App() {
     try { localStorage.setItem("bragi-font-size", name); } catch {}
   }, [preferences.fontSize, isLoaded]);
 
+  // apply the chosen letter spacing and keep a synchronous copy for the next startup
+  useEffect(() => {
+    if (!isLoaded) return;
+    const name = preferences.letterSpacing ?? DEFAULT_LETTER_SPACING;
+    applyLetterSpacing(name);
+    try { localStorage.setItem("bragi-letter-spacing", name); } catch {}
+  }, [preferences.letterSpacing, isLoaded]);
+
   function updateColors(changes: Record<string, string>) {
     setPreferences(prev => ({ ...prev, colors: { ...prev.colors, ...changes } }));
   }
@@ -156,6 +164,10 @@ function App() {
 
   function setFontSize(name: string) {
     setPreferences(prev => ({ ...prev, fontSize: name }));
+  }
+
+  function setLetterSpacing(name: string) {
+    setPreferences(prev => ({ ...prev, letterSpacing: name }));
   }
 
   function setShowKeybinds(value: boolean) {
@@ -301,6 +313,8 @@ function App() {
           onFontChange={setFont}
           fontSize={preferences.fontSize ?? DEFAULT_FONT_SIZE}
           onFontSizeChange={setFontSize}
+          letterSpacing={preferences.letterSpacing ?? DEFAULT_LETTER_SPACING}
+          onLetterSpacingChange={setLetterSpacing}
         />
       </div>
     );
@@ -342,6 +356,8 @@ function App() {
           onFontChange={setFont}
           fontSize={preferences.fontSize ?? DEFAULT_FONT_SIZE}
           onFontSizeChange={setFontSize}
+          letterSpacing={preferences.letterSpacing ?? DEFAULT_LETTER_SPACING}
+          onLetterSpacingChange={setLetterSpacing}
         />
       )}
     </div>

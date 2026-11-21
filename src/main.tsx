@@ -15,7 +15,8 @@ import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/vt323/400.css";
 import "@fontsource/silkscreen/400.css";
 import "@fontsource/press-start-2p/400.css";
-import { applyFont, DEFAULT_FONT, applyFontSize, DEFAULT_FONT_SIZE } from './fonts';
+import "@fontsource/pixelify-sans/400.css";
+import { applyFont, DEFAULT_FONT, applyFontSize, DEFAULT_FONT_SIZE, applyLetterSpacing, DEFAULT_LETTER_SPACING } from './fonts';
 
 document.documentElement.dataset.platform = isAndroid ? "mobile" : "desktop";
 
@@ -34,6 +35,9 @@ try {
 } catch {}
 try {
   applyFontSize(localStorage.getItem("bragi-font-size") ?? DEFAULT_FONT_SIZE);
+} catch {}
+try {
+  applyLetterSpacing(localStorage.getItem("bragi-letter-spacing") ?? DEFAULT_LETTER_SPACING);
 } catch {}
 
 // system-bar sizes from the native side (the WebView's own env(safe-area-inset-*) isn't reliable)

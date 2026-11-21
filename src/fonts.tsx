@@ -40,3 +40,18 @@ export function applyFontSize(name: string) {
   const size = FONT_SIZE_OPTIONS.find(s => s.name === name) ?? FONT_SIZE_OPTIONS[1];
   document.documentElement.style.setProperty("--app-font-size", `${size.px}px`);
 }
+
+export const LETTER_SPACING_OPTIONS = [
+  { name: "Tight", offset: "-0.03em" },
+  { name: "Default", offset: "0em" },
+  { name: "Wide", offset: "0.05em" },
+  { name: "Extra wide", offset: "0.1em" },
+];
+
+export const DEFAULT_LETTER_SPACING = "Default";
+
+// sets the offset added on top of the font's own spacing (see App.css)
+export function applyLetterSpacing(name: string) {
+  const option = LETTER_SPACING_OPTIONS.find(o => o.name === name) ?? LETTER_SPACING_OPTIONS[1];
+  document.documentElement.style.setProperty("--app-letter-spacing-offset", option.offset);
+}

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import './SettingsScreen.css';
-import { CursorList } from "../CursorList";
 import { PaletteColorPicker } from "../PaletteColorPicker";
+import { Dropdown } from "../Dropdown";
 import { getCssVariable } from "../../types_and_functions";
-import { FONT_OPTIONS, FONT_SIZE_OPTIONS } from "../../fonts";
+import { FONT_OPTIONS, FONT_SIZE_OPTIONS, LETTER_SPACING_OPTIONS } from "../../fonts";
 import { ArrowLeft } from "lucide-react";
 
 const ACCENT_PALETTE = [
@@ -48,7 +48,7 @@ const THEME_SETTINGS: ThemeSetting[] = [
 
 type ThemePreset = {
     name: string;
-    dark?: boolean;                   // true = shown with a dark background in the dropdown
+    dark?: boolean;
     colors: Record<string, string>;   // CSS variable -> color, for every setting
 };
 
@@ -74,15 +74,15 @@ function buildPreset(
 }
 
 const THEME_PRESETS: ThemePreset[] = [
-    { 
-        name: "Bragi", 
+    {
+        name: "Bragi",
         dark: true,
-        colors: buildPreset("#00ff9d", ["#25252B", "#1c1c20", "#141418"], "#ffffff") 
+        colors: buildPreset("#00ff9d", ["#25252B", "#1c1c20", "#141418"], "#ffffff")
     },
-    { 
-        name: "Midnight", 
+    {
+        name: "Midnight",
         dark: true,
-        colors: buildPreset("#5c7aff", ["#1b1f33", "#151827", "#0f1220"], "#ffffff") 
+        colors: buildPreset("#5c7aff", ["#1b1f33", "#151827", "#0f1220"], "#ffffff")
     },
     {
         name: "Sunset",
@@ -235,7 +235,79 @@ const THEME_PRESETS: ThemePreset[] = [
     },
 ];
 
-function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, onShowKeybindsChange, font, onFontChange, fontSize, onFontSizeChange }: {
+// the colors shown in a preset's strip in the dropdown: backgrounds and text first, then the accents
+function presetStrip(preset: ThemePreset): string[] {
+    const c = preset.colors;
+    return [
+        c["--tertiary-bg-color"],
+        c["--secondary-bg-color"],
+        c["--primary-bg-color"],
+        c["--text-color"],
+        c[GLOBAL_ACCENT],
+        c["--title-accent-color"],
+        c["--playlist-accent-color"],
+        c["--songs-accent-color"],
+        c["--progress-accent-color"],
+        c["--visualizer-accent-color"],
+    ];
+}
+
+const THEME_OPTIONS = THEME_PRESETS.map(p => ({ value: p.name, swatches: presetStrip(p) }));
+
+// one color: a small square + its label; clicking either opens the palette in a popover
+function ColorSwatch({ setting, color, alignRight, open, onToggle, onClose, onChange }: {
+    setting: ThemeSetting;
+    color: string;
+    alignRight: boolean;      // last column: the popover opens leftwards so it stays on screen
+    open: boolean;
+    onToggle: () => void;
+    onClose: () => void;
+    onChange: (hex: string) => void;
+}) {
+    // Escape closes the popover instead of leaving the page (capture = runs before the page's own listener)
+    useEffect(() => {
+        if (!open) return;
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                event.stopPropagation();
+                onClose();
+            }
+        }
+        window.addEventListener("keydown", handleKeyDown, true);
+        return () => window.removeEventListener("keydown", handleKeyDown, true);
+    }, [open, onClose]);
+
+    return (
+        <div className="color_item">
+            <button
+                type="button"
+                className="color_swatch"
+                style={{ backgroundColor: color }}
+                aria-label={setting.label}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={onToggle}
+            />
+            <span className="color_label" onClick={onToggle}>
+                {setting.label.replace(/ color$/, "")}
+            </span>
+
+            {open && (
+                <>
+                    <div className="color_cover" onClick={onClose} />
+                    <div className={`color_popover ${alignRight ? "color_popover_right" : ""}`}>
+                        <PaletteColorPicker
+                            color={color}
+                            palette={setting.palette}
+                            onChangeComplete={(c) => onChange(c.hex)}
+                        />
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, onShowKeybindsChange, font, onFontChange, fontSize, onFontSizeChange, letterSpacing, onLetterSpacingChange }: {
     onswitchToHomeScreen: () => void;
     onColorsChange: (changes: Record<string, string>) => void;
     showKeybinds: boolean;
@@ -244,15 +316,15 @@ function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, on
     onFontChange: (name: string) => void;
     fontSize: string;
     onFontSizeChange: (name: string) => void;
-}){
-
-    const categories = ["Theme"];
-    const [categoryIndex, setCategoryIndex] = useState(0);
-
+    letterSpacing: string;
+    onLetterSpacingChange: (name: string) => void;
+}) {
     // current value of every setting, keyed by CSS variable name
     const [colors, setColors] = useState<Record<string, string>>(() =>
         Object.fromEntries(THEME_SETTINGS.map(s => [s.variable, getCssVariable(s.variable)]))
     );
+    // which swatch has its popover open (null = none)
+    const [openVariable, setOpenVariable] = useState<string | null>(null);
 
     // applies a batch of changes: UI state, live CSS, and (via App) the preferences file
     function applyColors(changes: Record<string, string>) {
@@ -282,21 +354,35 @@ function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, on
     );
 
     useEffect(() => {
-        function handleKeyDown(event: KeyboardEvent){
-            if (event.code === "Escape"){
-                console.log("escape");
-                onswitchToHomeScreen();
-            }
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.code === "Escape") onswitchToHomeScreen();
         }
-
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    })
+    });
+
+    // two groups of swatches: accents (global one first) and backgrounds/text
+    const accentSettings = THEME_SETTINGS.filter(s => s.variable === GLOBAL_ACCENT || s.underGlobal);
+    const surfaceSettings = THEME_SETTINGS.filter(s => !accentSettings.includes(s));
+
+    function renderSwatches(list: ThemeSetting[]) {
+        return list.map((setting, index) => (
+            <ColorSwatch
+                key={setting.variable}
+                setting={setting}
+                color={colors[setting.variable]}
+                alignRight={index % 3 === 2}
+                open={openVariable === setting.variable}
+                onToggle={() => setOpenVariable(v => (v === setting.variable ? null : setting.variable))}
+                onClose={() => setOpenVariable(null)}
+                onChange={(hex) => changeColor(setting.variable, hex)}
+            />
+        ));
+    }
 
     return (
-        <div className="settings_screen_container">
-            <div className="side_panel">
-
+        <div className="settings_page">
+            <header className="settings_header">
                 <button
                     className="settings_back_button"
                     tabIndex={-1}
@@ -307,86 +393,70 @@ function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, on
                 >
                     <ArrowLeft size={28} strokeWidth={3} />
                 </button>
+                <h1 className="settings_title">Settings</h1>
+                <span className="settings_hint">Esc to go back</span>
+            </header>
 
-                <CursorList
-                    className="category_list"
-                    items={categories}
-                    keyExtractor={(category) => category}
-                    renderItem={(category, isSelected) => (
-                        <div className="setting_category_item" style={{ color: isSelected ? "var(--settings-side-accent-color)" : "var(--text-color)" }}>
-                            {category}
-                        </div>
-                    )}
-                    selectedIndex={categoryIndex}
-                    onSelectedIndexChange={setCategoryIndex}
-                />
-            </div>
+            <div className="settings_body">
+                <div className="settings_column">
 
-            <div className="main_settings_panel">
-                {categoryIndex===0 && (
-                    <div className="theme_settings_container">
+                    <section className="settings_card">
+                        <h2 className="settings_card_title">Theme</h2>
+                        <Dropdown
+                            value={activePreset?.name ?? ""}
+                            options={THEME_OPTIONS}
+                            onChange={(name) => {
+                                const preset = THEME_PRESETS.find(p => p.name === name);
+                                if (preset) applyColors(preset.colors);
+                            }}
+                        />
+                    </section>
 
-                        <div className="setting">
-                            <div className="setting_label">Preset themes</div>
-                            <div className="setting_control">
-                                <select
-                                    className="preset_select app_input"
-                                    value={activePreset?.name ?? ""}
-                                    data-dark={activePreset?.dark ? "true" : "false"}
-                                    onChange={(e) => {
-                                        const preset = THEME_PRESETS.find(p => p.name === e.target.value);
-                                        if (preset) applyColors(preset.colors);
-                                        e.target.blur();   // hand the keyboard back to the app's shortcuts
-                                    }}
-                                    // keep typing in the dropdown away from the window shortcuts (Escape still leaves)
-                                    onKeyDown={(e) => { if (e.key !== "Escape") e.stopPropagation(); }}
-                                >
-                                    <option value="" disabled>Custom</option>
-                                    {THEME_PRESETS.map(preset => (
-                                        <option
-                                            key={preset.name}
-                                            value={preset.name}
-                                            className={preset.dark ? "preset_option_dark" : "preset_option_light"}
-                                        >{preset.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+                    <section className="settings_card">
+                        <h2 className="settings_card_title">Accent colors</h2>
+                        <div className="color_grid">{renderSwatches(accentSettings)}</div>
+                        <p className="settings_note">
+                            "Global accent" sets every accent at once. Change the others afterwards to fine-tune.
+                        </p>
 
-                        <div className="setting">
-                            <div className="setting_label">Font</div>
-                            <div className="setting_control">
-                                <select
-                                    className="preset_select app_input"
+                        <h2 className="settings_card_title settings_card_title_spaced">Backgrounds and text</h2>
+                        <div className="color_grid">{renderSwatches(surfaceSettings)}</div>
+                        <p className="settings_note">Click a color to change it.</p>
+                    </section>
+
+                    <section className="settings_card">
+                        <h2 className="settings_card_title">Font</h2>
+                        <div className="settings_row_two">
+                            <div className="settings_field">
+                                <span className="settings_field_label">Typeface</span>
+                                <Dropdown
                                     value={font}
-                                    onChange={(e) => { onFontChange(e.target.value); e.target.blur(); }}
-                                    onKeyDown={(e) => { if (e.key !== "Escape") e.stopPropagation(); }}
-                                >
-                                    {FONT_OPTIONS.map(f => (
-                                        <option key={f.name} value={f.name} style={{ fontFamily: f.family }}>{f.name}</option>
-                                    ))}
-                                </select>
+                                    options={FONT_OPTIONS.map(f => ({ value: f.name, fontFamily: f.family }))}
+                                    onChange={onFontChange}
+                                />
                             </div>
-                        </div>
-
-                        <div className="setting">
-                            <div className="setting_label">Font size</div>
-                            <div className="setting_control">
-                                <select
-                                    className="preset_select app_input"
+                            <div className="settings_field">
+                                <span className="settings_field_label">Size</span>
+                                <Dropdown
                                     value={fontSize}
-                                    onChange={(e) => { onFontSizeChange(e.target.value); e.target.blur(); }}
-                                    onKeyDown={(e) => { if (e.key !== "Escape") e.stopPropagation(); }}
-                                >
-                                    {FONT_SIZE_OPTIONS.map(s => (
-                                        <option key={s.name} value={s.name}>{s.name}</option>
-                                    ))}
-                                </select>
+                                    options={FONT_SIZE_OPTIONS.map(s => ({ value: s.name }))}
+                                    onChange={onFontSizeChange}
+                                />
+                            </div>
+                            <div className="settings_field">
+                                <span className="settings_field_label">Letter spacing</span>
+                                <Dropdown
+                                    value={letterSpacing}
+                                    options={LETTER_SPACING_OPTIONS.map(o => ({ value: o.name }))}
+                                    onChange={onLetterSpacingChange}
+                                />
                             </div>
                         </div>
+                    </section>
 
-                        <div className="setting">
-                            <div className="setting_label">Show keybinds</div>
+                    <section className="settings_card">
+                        <h2 className="settings_card_title">Interface</h2>
+                        <label className="settings_checkbox_row">
                             <input
                                 type="checkbox"
                                 className="setting_checkbox"
@@ -396,27 +466,14 @@ function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, on
                                     e.target.blur();   // otherwise Space would toggle the box instead of pausing the music
                                 }}
                             />
-                        </div>
+                            <span>Show keybind hints under the lists</span>
+                        </label>
+                    </section>
 
-                        {THEME_SETTINGS.map((setting) => (
-                            <div className="setting" key={setting.variable}>
-                                <div className={`setting_label ${setting.underGlobal ? "setting_label_indented" : ""}`}>{setting.label}</div>
-                                <div className="setting_control">
-                                    <PaletteColorPicker
-                                        color={colors[setting.variable]}
-                                        onChangeComplete={(color) => changeColor(setting.variable, color.hex)}
-                                        palette={setting.palette}
-                                    />
-                                </div>
-                                
-                            </div>
-                        ))}
-                    </div>
-                )}
+                </div>
             </div>
         </div>
-    )
-
+    );
 }
 
-export {SettingsScreen, THEME_PRESETS};
+export { SettingsScreen, THEME_PRESETS };

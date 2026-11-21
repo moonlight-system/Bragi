@@ -11,7 +11,7 @@
 }
 :root {
   font-family: var(--app-font, "Pixelify Sans", sans-serif);
-  letter-spacing: var(--app-letter-spacing, 0.15em);
+  letter-spacing: calc(var(--app-letter-spacing, 0.15em) + var(--app-letter-spacing-offset, 0em));
   font-size: var(--app-font-size, 16px);
   line-height: 1.5rem;
   font-weight: 400;

@@ -35,6 +35,9 @@ importers:
       '@fontsource/opendyslexic':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/pixelify-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/press-start-2p':
         specifier: ^5.3.0
         version: 5.3.0
@@ -134,6 +137,9 @@ packages:
 
   '@fontsource/opendyslexic@5.3.0':
     resolution: {integrity: sha512-BVYIW/ghc1U2iAghhYTN+GFWiZ3lnCy8Jf2KkZC23aHQHBNcMqKT718zckfqVxRx4qsXJmIMPWvczirRuhmtsg==}
+
+  '@fontsource/pixelify-sans@5.3.0':
+    resolution: {integrity: sha512-4RCe9nXbi7wUu5+H0FNX1sgPZ2kJ1MmY1uTkEfvQIzzqhoS8zGKJaJfdK8oreE0OU+5gM+NdurFi3H3FJRBvyw==}
 
   '@fontsource/press-start-2p@5.3.0':
     resolution: {integrity: sha512-gxWFxdeDglPhEYSwEeooomcaFK8kSQYLQwVxfnOJeYRj2sPEHXjpVtFgEaYfqzOjuAJGrIcJOipu2KY5YkbyuQ==}
@@ -691,6 +697,8 @@ snapshots:
   '@fontsource/open-sans@5.3.0': {}
 
   '@fontsource/opendyslexic@5.3.0': {}
+
+  '@fontsource/pixelify-sans@5.3.0': {}
 
   '@fontsource/press-start-2p@5.3.0': {}
 

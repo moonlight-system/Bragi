@@ -29,6 +29,7 @@ export type UserPreferences = {
   showKeybinds?: boolean;
   font?: string;
   fontSize?: string;
+  letterSpacing?: string;
 };
 
 export const isAndroid = navigator.userAgent.includes('Android');

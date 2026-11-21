@@ -12,9 +12,9 @@ import { ProgressBar } from "../ProgressBar";
 import { Visualizer } from "../Visualizer";
 import { EditableLabel } from "../EditableLabel";
 import type { ItemEditor, CursorListHandle } from "../CursorList";
-import { parseBuffer } from 'music-metadata';
+import { readTags } from '../../importSongs';
 import { readFile, writeFile } from '@tauri-apps/plugin-fs';
-import { isAndroid, newId, audioExt, audioMime, stripAudioExt, AUDIO_EXTENSIONS } from '../../types_and_functions';
+import { newId, audioExt, audioMime, stripAudioExt, AUDIO_EXTENSIONS } from '../../types_and_functions';
 import { Pause, Play, Plus, Repeat1, RotateCcw, RotateCw, Shuffle, SkipBack, SkipForward, Settings } from "lucide-react";
 import { VolumeSlider } from "../VolumeSlider";
 
@@ -35,17 +35,6 @@ function SongListItem({ song, selected, editor }: {
       </div>
     </div>
   );
-}
-
-// reads the artist from the mp3's tags (ID3); null if the file has none or can't be read
-async function readTags(bytes: Uint8Array, mimeType: string): Promise<{ title: string | null; artist: string | null }> {
-  try {
-    const meta = await parseBuffer(bytes, { mimeType }, { duration: false, skipCovers: true });
-    return { title: meta.common.title?.trim() || null, artist: meta.common.artist?.trim() || null };
-  } catch (err) {
-    console.error('could not read tags:', err);
-    return { title: null, artist: null };
-  }
 }
 
 function HomeScreen({
@@ -152,7 +141,7 @@ function HomeScreen({
       newSongs.push({
         id,
         path: `${id}.${ext}`,
-        name: isAndroid ? (title ?? 'Unknown') : stripAudioExt(fileName),
+        name: title ?? stripAudioExt(fileName),
         artist: artist ?? 'Unknown Artist',
       });
     }

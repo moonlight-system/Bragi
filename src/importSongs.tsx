@@ -5,7 +5,7 @@ import { getBragiDir } from './storage';
 import { newId, audioExt, audioMime, stripAudioExt, AUDIO_EXTENSIONS } from './types_and_functions';
 import type { Song } from './types_and_functions';
 
-async function readTags(bytes: Uint8Array, mimeType: string): Promise<{ title: string | null; artist: string | null }> {
+export async function readTags(bytes: Uint8Array, mimeType: string): Promise<{ title: string | null; artist: string | null }> {
   try {
     const meta = await parseBuffer(bytes, { mimeType }, { duration: false, skipCovers: true });
     console.log('tags:', meta.common.title, '|', meta.common.artist, '| tag types:', meta.format.tagTypes);

@@ -1,0 +1,91 @@
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown_trigger {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-radius: 4px;
+    text-align: left;
+    letter-spacing: inherit;
+    background-color: var(--secondary-bg-color);
+}
+
+/* two classes beat the global "button:hover" rule in App.css */
+.dropdown_trigger:hover {
+    background-color: var(--tertiary-bg-color);
+}
+
+.dropdown_cover {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+}
+
+.dropdown_menu {
+    position: absolute;
+    z-index: 11;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    max-height: 16rem;
+    overflow-y: auto;
+    background-color: var(--tertiary-bg-color);
+    border-top: 0.2rem solid var(--settings-side-accent-color);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.5);
+}
+.dropdown_menu_up {
+    top: auto;
+    bottom: calc(100% + 0.25rem);
+}
+
+.dropdown_option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+}
+.dropdown_option_highlight {
+    background-color: var(--primary-bg-color);
+    color: var(--settings-side-accent-color);
+}
+.dropdown_option_selected {
+    color: var(--settings-side-accent-color);
+}
+
+.dropdown_option_label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* the strip of colors: one bordered, rounded bar made of equal cells */
+.dropdown_strip {
+    display: flex;
+    flex-shrink: 0;
+    width: 7.5rem;
+    height: 1.1rem;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--text-color) 35%, transparent);
+}
+.dropdown_strip_cell {
+    flex: 1;
+}
+
+/* same scrollbar as the playlist / songs lists */
+.dropdown_menu::-webkit-scrollbar {
+    width: 6px;
+}
+.dropdown_menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+.dropdown_menu::-webkit-scrollbar-thumb {
+    background-color: var(--settings-side-accent-color);
+    border-radius: 2px;
+}

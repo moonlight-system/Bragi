@@ -39,7 +39,7 @@ type Modal =
   | { kind: "mp3Picker"; playlist: Playlist }
   | null;
 
-function MobileShell({ playlists, songs, player, onColorsChange, actions, backOnRight, onBackOnRightChange, font, onFontChange, fontSize, onFontSizeChange }: {
+function MobileShell({ playlists, songs, player, onColorsChange, actions, backOnRight, onBackOnRightChange, font, onFontChange, fontSize, onFontSizeChange, letterSpacing, onLetterSpacingChange }: {
   playlists: Playlist[];
   songs: Song[];
   player: Player;
@@ -51,6 +51,8 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
   onFontChange: (name: string) => void;
   fontSize: string;
   onFontSizeChange: (name: string) => void;
+  letterSpacing: string;
+  onLetterSpacingChange: (name: string) => void;
 }) {
   const nav = useMobileNav();
   const [viewedPlaylistId, setViewedPlaylistId] = useState<string | null>(null);
@@ -227,7 +229,7 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
             )}
             {nav.screen === "player" && <MobilePlayerScreen player={player} />}
             {nav.screen === "settings" && (
-              <MobileSettings onColorsChange={onColorsChange} backOnRight={backOnRight} onBackOnRightChange={onBackOnRightChange} font={font} onFontChange={onFontChange} fontSize={fontSize} onFontSizeChange={onFontSizeChange} />
+              <MobileSettings onColorsChange={onColorsChange} backOnRight={backOnRight} onBackOnRightChange={onBackOnRightChange} font={font} onFontChange={onFontChange} fontSize={fontSize} onFontSizeChange={onFontSizeChange} letterSpacing={letterSpacing} onLetterSpacingChange={onLetterSpacingChange} />
             )}
           </main>
   

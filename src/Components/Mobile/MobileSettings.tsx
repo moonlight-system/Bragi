@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { THEME_PRESETS } from "../Screens/SettingsScreen";
 import { getCssVariable } from "../../types_and_functions";
-import { FONT_OPTIONS, FONT_SIZE_OPTIONS } from "../../fonts";
+import { FONT_OPTIONS, FONT_SIZE_OPTIONS, LETTER_SPACING_OPTIONS } from "../../fonts";
 
-function MobileSettings({ onColorsChange, backOnRight, onBackOnRightChange, font, onFontChange, fontSize, onFontSizeChange }: {
+function MobileSettings({ onColorsChange, backOnRight, onBackOnRightChange, font, onFontChange, fontSize, onFontSizeChange, letterSpacing, onLetterSpacingChange }: {
   onColorsChange: (changes: Record<string, string>) => void;
   backOnRight: boolean;
   onBackOnRightChange: (value: boolean) => void;
@@ -11,6 +11,8 @@ function MobileSettings({ onColorsChange, backOnRight, onBackOnRightChange, font
   onFontChange: (name: string) => void;
   fontSize: string;
   onFontSizeChange: (name: string) => void;
+  letterSpacing: string;
+  onLetterSpacingChange: (name: string) => void;
 }) {
   // the preset matching the current CSS variables (empty = "Custom")
   const [active, setActive] = useState(() =>
@@ -54,6 +56,13 @@ function MobileSettings({ onColorsChange, backOnRight, onBackOnRightChange, font
         <div>Font size</div>
         <select className="app_input m_select" value={fontSize} onChange={(e) => onFontSizeChange(e.target.value)}>
           {FONT_SIZE_OPTIONS.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
+        </select>
+      </div>
+
+      <div className="m_setting_row" style={{ marginTop: "1.5rem" }}>
+        <div>Letter spacing</div>
+        <select className="app_input m_select" value={letterSpacing} onChange={(e) => onLetterSpacingChange(e.target.value)}>
+          {LETTER_SPACING_OPTIONS.map(o => <option key={o.name} value={o.name}>{o.name}</option>)}
         </select>
       </div>
 

@@ -65,7 +65,7 @@ async function loadPreferences(): Promise<UserPreferences> {
   }
   try {
     const parsed = JSON.parse(await readTextFile(filePath));
-    return { colors: parsed.colors ?? {}, backOnRight: parsed.backOnRight ?? false, showKeybinds: parsed.showKeybinds ?? true, font: parsed.font, fontSize: parsed.fontSize };
+    return { colors: parsed.colors ?? {}, backOnRight: parsed.backOnRight ?? false, showKeybinds: parsed.showKeybinds ?? true, font: parsed.font, fontSize: parsed.fontSize, letterSpacing: parsed.letterSpacing };
   } catch {
     // unreadable or corrupted file: start from the defaults instead of crashing the app
     return { colors: {} };
