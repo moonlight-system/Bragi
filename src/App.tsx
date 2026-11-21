@@ -15,8 +15,6 @@ import { applyFont, DEFAULT_FONT, applyFontSize, DEFAULT_FONT_SIZE, applyLetterS
 function App() {
   const [currentScreen, setCurrentScreen] = useState<"HomeScreen" | "SettingsScreen">("HomeScreen");
 
-  const [playlistIndex, setPlaylistIndex] = useState(0);
-  const [songIndex, setSongIndex] = useState(0);
   const [viewedPlaylistId, setViewedPlaylistId] = useState<string | null>(null);
 
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -228,7 +226,6 @@ function App() {
           : p
       )
     );
-    console.log(songs);
   }
 
   function renameSong(songToRename: Song, newName: string) {
@@ -240,6 +237,12 @@ function App() {
   function renameArtist(songToUpdate: Song, newArtist: string) {
     setSongs(prev =>
       prev.map(s => (s.id === songToUpdate.id ? { ...s, artist: newArtist } : s))
+    );
+  }
+
+  function setSongCover(songToUpdate: Song, cover: string) {
+    setSongs(prev =>
+      prev.map(s => (s.id === songToUpdate.id ? { ...s, cover } : s))
     );
   }
 
@@ -303,6 +306,7 @@ function App() {
             addSongs,
             renameSong,
             renameArtist,
+            setSongCover,
             removeSong: removeSongFromPlaylist,
             moveSong,
             copySong: copySongToPlaylist,
@@ -325,17 +329,14 @@ function App() {
       {currentScreen == "HomeScreen" && (
         <HomeScreen
           playlists={playlists}
-          playlistIndex={playlistIndex}
-          onPlaylistIndexChange={setPlaylistIndex}
           viewedPlaylistId={viewedPlaylistId}
           onViewedPlaylistIdChange={setViewedPlaylistId}
           onCreatePlaylist={createPlaylist}
           onDeletePlaylist={deletePlaylist}
           onRenamePlaylist={renamePlaylist}
           onMovePlaylist={movePlaylist}
+          onSetPlaylistCover={setPlaylistCover}
           songs={songs}
-          songIndex={songIndex}
-          onSongIndexChange={setSongIndex}
           onSwitchToSettingsScreen={onSwitchToSettingsScreen}
           onAddSongs={addSongs}
           onRenameSong={renameSong}
@@ -343,6 +344,7 @@ function App() {
           onRemoveSong={removeSongFromPlaylist}
           onMoveSong={moveSong}
           onCopySong={copySongToPlaylist}
+          onSetSongCover={setSongCover}
           player={player}
         />
       )}

@@ -3,6 +3,7 @@ export type Song = {
   path: string;   // path to the mp3 file, relative to the songs/ folder
   name: string;
   artist: string;
+  cover?: string; // file name of the cover image, relative to the covers/ folder
 };
 
 export type Playlist = {

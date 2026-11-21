@@ -17,6 +17,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.media.session.MediaButtonReceiver
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
 
@@ -32,6 +33,8 @@ class MediaPlaybackService : Service() {
 
         var themeColor: Int = 0xFF25252B.toInt()
         var accentColor: Int = 0xFF00FF9D.toInt()
+        // absolute path of the current song's cover ("" = none), set by the page before each update
+        var coverPath: String = ""
 
         fun update(ctx: Context, title: String, artist: String, playing: Boolean, posMs: Long, durMs: Long) {
             val svc = instance
@@ -58,24 +61,35 @@ class MediaPlaybackService : Service() {
     private var artCache: Bitmap? = null
     private var artCacheColor = 0
     private var artCacheAccent = 0
+    private var artCachePath = ""
 
     private fun artwork(): Bitmap {
         val cached = artCache
-        if (cached != null && artCacheColor == themeColor && artCacheAccent == accentColor) return cached
-        val size = 512
-        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bmp)
-        canvas.drawColor(themeColor)
-        // the music-note vector, tinted with the theme accent: this is what Samsung samples
-        ContextCompat.getDrawable(this, R.drawable.ic_stat_bragi)?.mutate()?.let {
-            it.setTint(accentColor)
-            val pad = size / 4
-            it.setBounds(pad, pad, size - pad, size - pad)
-            it.draw(canvas)
+        if (cached != null && artCacheColor == themeColor && artCacheAccent == accentColor && artCachePath == coverPath) {
+            return cached
         }
+
+        // the song's own cover if it has one, otherwise the generated music-note image
+        val fromCover = if (coverPath.isNotEmpty()) BitmapFactory.decodeFile(coverPath) else null
+        val bmp = fromCover ?: run {
+            val size = 512
+            val generated = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(generated)
+            canvas.drawColor(themeColor)
+            // the music-note vector, tinted with the theme accent: this is what Samsung samples
+            ContextCompat.getDrawable(this, R.drawable.ic_stat_bragi)?.mutate()?.let {
+                it.setTint(accentColor)
+                val pad = size / 4
+                it.setBounds(pad, pad, size - pad, size - pad)
+                it.draw(canvas)
+            }
+            generated
+        }
+
         artCache = bmp
         artCacheColor = themeColor
         artCacheAccent = accentColor
+        artCachePath = coverPath
         return bmp
     }
 

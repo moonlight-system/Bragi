@@ -1,0 +1,59 @@
+.cover_box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    color: grey;
+    /* a tint of the text color: visible on every panel background */
+    background-color: color-mix(in srgb, var(--text-color) 10%, transparent);
+    background-size: cover;
+    background-position: center;
+}
+
+.cover_icon {
+    width: 50%;
+    height: 50%;
+    opacity: 0.6;
+}
+
+/* sizes */
+.cover_row { width: 3rem; height: 3rem; }        /* desktop list rows */
+.cover_sm  { width: 2.75rem; height: 2.75rem; }  /* mobile mini player */
+.cover_md  { width: 3.5rem; height: 3.5rem; }    /* mobile song rows */
+.cover_lg  { width: 4rem; height: 4rem; }        /* mobile playlist rows */
+
+/* big cover of the player (desktop panel and mobile screen): the largest square that fits the space */
+.cover_area {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    container-type: size;
+}
+.player_cover {
+    width: min(100cqw, 100cqh);
+    height: min(100cqw, 100cqh);
+    border-radius: 6px;
+}
+.player_cover .cover_icon {
+    width: 35%;
+    height: 35%;
+}
+
+/* list row = thumbnail + text */
+.item_row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+.item_text {
+    flex: 1;
+    min-width: 0;
+}
+.item_sub {
+    color: grey;
+}

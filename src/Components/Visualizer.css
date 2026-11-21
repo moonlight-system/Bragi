@@ -4,3 +4,17 @@
     height: auto;              /* keeps the canvas's own aspect ratio */
     image-rendering: pixelated; /* crisp blocks instead of blurry scaling */
 }
+
+/* compact strip under the cover: fixed height, the canvas keeps its proportions */
+.visualizer_strip {
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 4rem;
+    margin-top: 0.75rem;
+}
+.visualizer_strip .visualizer_canvas {
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+}

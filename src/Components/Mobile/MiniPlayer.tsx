@@ -1,5 +1,6 @@
 import type { Player } from "../../usePlayer";
 import { SkipBack, SkipForward, Play, Pause } from "lucide-react";
+import { SongCover } from "../Cover";
 
 function MiniPlayer({ player, onOpen }: {
   player: Player;
@@ -16,7 +17,7 @@ function MiniPlayer({ player, onOpen }: {
 
   return (
     <div className="m_miniplayer" onClick={onOpen}>
-      {/*<div className="m_cover m_cover_small" />*/}
+      <SongCover file={song.cover} className="cover_sm" />
       <div className="m_mini_text">
         <div className="m_mini_name">{song.name}</div>
         <div className="m_mini_artist">{song.artist}</div>

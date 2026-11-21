@@ -67,6 +67,7 @@ function resumeContext() {
 
 // song currently loaded, and the next song's blob URL (read ahead of time)
 let nowPlaying: Song | null = null;
+let nowPlayingCover = '';   // absolute path of its cover file ('' = none), for the Android notification
 let preloaded: { id: string; url: string } | null = null;
 
 async function readSongBytes(song: Song) {
@@ -92,6 +93,7 @@ function pushMedia() {
   if (!bridge || !nowPlaying) return;
   bridge.setColor(toHex(getCssVariable('--primary-bg-color')));
   bridge.setAccent(toHex(getCssVariable('--global-accent-color')));
+  bridge.setCover?.(nowPlayingCover);
   const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
   bridge.update(nowPlaying.name, nowPlaying.artist, !audio.paused, audio.currentTime * 1000, duration * 1000);
 }
@@ -118,7 +120,7 @@ function shuffled(ids: string[], firstId: string | null): string[] {
 function usePlayer(songs: Song[]) {
   const [queue, setQueue] = useState<Queue>(EMPTY_QUEUE);
   const [shuffle, setShuffle] = useState(false);
-  const [loop, setLoop] = useState(false);  
+  const [loop, setLoop] = useState(false);
   const currentId: string | undefined = queue.order[queue.position];
   const currentSong = songs.find(s => s.id === currentId) ?? null;
   const [isPlaying, setIsPlaying] = useState(false);
@@ -188,9 +190,13 @@ function usePlayer(songs: Song[]) {
     resumeContext();
     nowPlaying = song;
     try {
+      // the notification reads the cover straight from disk
+      nowPlayingCover = song.cover ? await join(await getBragiDir(), 'covers', song.cover) : '';
+      if (myLoadId !== loadIdRef.current) return;
+
       let url: string;
       if (preloaded && preloaded.id === song.id) {
-        url = preloaded.url;   // already in memory: no async work needed
+        url = preloaded.url;   // already in memory
         preloaded = null;
       } else {
         const bytes = await readSongBytes(song);
@@ -207,9 +213,10 @@ function usePlayer(songs: Song[]) {
     }
   }
 
-  function playSong(song: Song, playlist: Playlist) {
+  // `ids` is the order the queue follows (defaults to the playlist's own order)
+  function playSong(song: Song, playlist: Playlist, ids: string[] = playlist.songIds) {
     setHasPlayed(true);
-    const base = [...playlist.songIds];
+    const base = [...ids];
     const order = shuffle ? shuffled(base, song.id) : base;
     const position = shuffle ? 0 : base.indexOf(song.id);
     setQueue({ base, order, position, playlistId: playlist.id });
@@ -220,7 +227,7 @@ function usePlayer(songs: Song[]) {
     const { order, position } = queue;
     const n = order.length;
     if (n === 0) return;
-  
+
     // walk in that direction, skipping ids whose Song no longer exists
     for (let i = 1; i <= n; i++) {
       const pos = (((position + direction * i) % n) + n) % n;
@@ -233,7 +240,7 @@ function usePlayer(songs: Song[]) {
     }
     stop(); // nothing playable left
   }
-  
+
   function previous() {
     // like most players: restart the song if it's already well underway
     if (audio.currentTime > 3) {
@@ -286,7 +293,7 @@ function usePlayer(songs: Song[]) {
   useEffect(() => {
     audio.loop = loop;
   }, [loop]);
-  
+
   // auto-advance when a song ends. `step` is recreated every render and reads
   // the current queue, so the listener (registered once) calls the latest one via a ref
   const stepRef = useRef(step);
@@ -296,7 +303,7 @@ function usePlayer(songs: Song[]) {
     audio.addEventListener('ended', onEnded);
     return () => audio.removeEventListener('ended', onEnded);
   }, []);
-  
+
   // the playing song's record was deleted: stop instead of playing a ghost
   useEffect(() => {
     if (currentId && !songs.some(s => s.id === currentId)) stop();

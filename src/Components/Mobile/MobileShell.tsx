@@ -8,7 +8,7 @@ import { MobileSettings } from "./MobileSettings";
 import { MiniPlayer } from "./MiniPlayer";
 import { ActionSheet, TextPrompt } from "./Sheets";
 import type { SheetAction } from "./Sheets";
-import { pickSongs } from "../../importSongs";
+import { pickSongs, refreshSongCover } from "../../importSongs";
 import { pickCover } from "../../pickCover";
 import { ChevronLeft, Plus, Settings } from "lucide-react";
 import { Mp3Picker } from "./Mp3Picker";
@@ -25,6 +25,7 @@ export type MobileActions = {
   addSongs: (newSongs: Song[], targetPlaylist: Playlist) => void;
   renameSong: (song: Song, newName: string) => void;
   renameArtist: (song: Song, newArtist: string) => void;
+  setSongCover: (song: Song, cover: string) => void;
   removeSong: (song: Song, playlist: Playlist) => void;
   moveSong: (song: Song, playlist: Playlist, direction: "up" | "down") => void;
   copySong: (song: Song, targetPlaylist: Playlist) => void;
@@ -147,6 +148,16 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
     }
   }
 
+  // for songs imported before covers existed
+  async function reloadCover(song: Song) {
+    try {
+      const cover = await refreshSongCover(song);
+      if (cover) actions.setSongCover(song, cover);
+    } catch (err) {
+      console.error("reload cover failed:", err);
+    }
+  }
+
   function playlistMenuActions(p: Playlist): SheetAction[] {
     const index = playlists.findIndex(x => x.id === p.id);
     const list: SheetAction[] = [
@@ -175,6 +186,7 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
           kind: "prompt", title: "Edit artist", initial: s.artist,
           onSubmit: (artist) => actions.renameArtist(s, artist),
       }) },
+      { label: "Reload cover from file", onPick: () => reloadCover(s) },
     ];
     if (index > 0) list.push({ label: "Move up", onPick: () => actions.moveSong(s, viewedPlaylist, "up") });
     if (index < last) list.push({ label: "Move down", onPick: () => actions.moveSong(s, viewedPlaylist, "down") });
@@ -232,7 +244,7 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
               <MobileSettings onColorsChange={onColorsChange} backOnRight={backOnRight} onBackOnRightChange={onBackOnRightChange} font={font} onFontChange={onFontChange} fontSize={fontSize} onFontSizeChange={onFontSizeChange} letterSpacing={letterSpacing} onLetterSpacingChange={onLetterSpacingChange} />
             )}
           </main>
-  
+
           {showFab && (
             <button className="m_fab" onClick={onFab} aria-label="Add">
               <Plus size={30} strokeWidth={4} />
@@ -248,11 +260,11 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
 
           {importing && <div className="m_importing">Importing…</div>}
         </div>
-  
+
         {nav.screen !== "player" && (
           <MiniPlayer player={player} onOpen={() => nav.push("player")} />
         )}
-  
+
         {modal?.kind === "playlistMenu" && (
           <ActionSheet title={modal.playlist.name} actions={sheetActions(playlistMenuActions(modal.playlist))} onClose={close} />
         )}

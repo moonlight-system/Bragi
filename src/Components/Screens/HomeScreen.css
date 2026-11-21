@@ -77,14 +77,14 @@
 
 .panel:first-child{
     background-color: var(--tertiary-bg-color);
-    width: clamp(14rem, 22vw, 25rem);
+    width: clamp(16rem, 24vw, 27rem);
 }
 .song_panel{
     background-color: var(--secondary-bg-color);
-    width: clamp(16rem, 26vw, 30rem);
+    width: clamp(18rem, 28vw, 32rem);
 }
 
-/* each panel tells the cursor lists inside it which color to use for the ">" and the scrollbar */
+/* each panel tells the cursor lists inside it which color to use for the highlights and the scrollbar */
 .playlist_panel,
 .copy_picker {
     --list-accent-color: var(--playlist-accent-color);
@@ -190,16 +190,6 @@
     color: grey;
 }
 
-
-
-.visualizer_area {
-    flex: 1;              /* takes all the space left above the group */
-    min-height: 0;
-    display: flex;
-    align-items: center;  /* vertical centering */
-    justify-content: center;
-}
-
 .player_group {
     flex-shrink: 0;
     margin-bottom: 3rem;
@@ -223,13 +213,49 @@
     display: none;
 }
 
-.player_playlist_name {
-    color: var(--playlist-accent-color);
-    font-size: 2rem;
-    text-align: center;
+/* the cover is a square: don't let the generic ".playlist_list div" margin touch it */
+.playlist_list .cover_box {
+    margin-top: 0;
+}
+
+/* header of the songs panel */
+.song_panel_header {
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+}
+.song_panel_title {
+    font-size: 1.5rem;
+    color: var(--songs-accent-color);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.song_panel_count {
+    font-size: 1rem;
+    color: grey;
+}
+
+/* search field + sort button */
+.song_panel_tools {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+}
+.song_search {
+    flex: 1;
+    min-width: 0;
+    border-radius: 4px;
+    letter-spacing: inherit;
+    background-color: var(--primary-bg-color);
+}
+.sort_button {
+    flex-shrink: 0;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+}
+.sort_button_on {
+    color: var(--songs-accent-color);
 }
 
 .add_button {
@@ -268,6 +294,13 @@
     margin-top: -1.2rem;               /* same as the panel's padding: the container now starts at the panel's top edge */
     padding-top: 1.2rem;               /* gives the space back, so the first row stays where it was */
     scroll-padding-top: 1.2rem;
+}
+
+/* the songs panel has a header above its list: no need to reach the panel's top edge */
+.song_panel .cursor_list_scroll {
+    margin-top: 0;
+    padding-top: 0;
+    scroll-padding-top: 0;
 }
 
 .horizontal_panels .cursor_list_inner {

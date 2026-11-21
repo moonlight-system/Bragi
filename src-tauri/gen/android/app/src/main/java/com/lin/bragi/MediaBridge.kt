@@ -32,4 +32,10 @@ class MediaBridge(private val ctx: Context) {
         } catch (e: IllegalArgumentException) {
         }
     }
+
+    // absolute path of the current song's cover file, or "" when it has none
+    @JavascriptInterface
+    fun setCover(path: String) {
+        MediaPlaybackService.coverPath = path
+    }
 }

@@ -3,6 +3,7 @@ import type { Player } from "../../usePlayer";
 import { Visualizer } from "../Visualizer";
 import { ProgressBar } from "../ProgressBar";
 import { PressableRow } from "./PressableRow";
+import { CoverBox, SongCover } from "../Cover";
 import { SkipBack, SkipForward, Play, Pause, Repeat1, Shuffle, RotateCcw, RotateCw } from "lucide-react";
 import { VolumeSlider } from "../VolumeSlider";
 
@@ -16,10 +17,7 @@ function MobilePlaylistsScreen({ playlists, onOpen, onMenu }: {
     <div>
       {playlists.map(p => (
         <PressableRow key={p.id} className="m_playlist_item" onTap={() => onOpen(p)} onMenu={() => onMenu(p)}>
-          <div
-            className="m_cover"
-            style={p.cover ? { backgroundImage: `url(${p.cover})` } : undefined}
-          />
+          <CoverBox url={p.cover} className="cover_lg" />
           <div className="m_playlist_text">
             <div className="m_playlist_name">{p.name}</div>
             <div className="m_item_sub">
@@ -48,6 +46,7 @@ function MobileSongsScreen({ playlist, songs, playingSongId, onPlay, onMenu }: {
     <div>
       {playlistSongs.map(s => (
         <PressableRow key={s.id} className="m_list_item" onTap={() => onPlay(s)} onMenu={() => onMenu(s)}>
+          <SongCover file={s.cover} className="cover_md" />
           <div className="m_row_text">
             <div style={{ color: s.id === playingSongId ? "var(--songs-accent-color)" : "var(--text-color)" }}>
               {s.name}
@@ -66,7 +65,11 @@ function MobilePlayerScreen({ player }: { player: Player }) {
 
   return (
     <div className="m_player">
-      <div className="m_visualizer"><Visualizer /></div>
+      <div className="cover_area">
+        <SongCover file={song?.cover} className="player_cover" />
+      </div>
+
+      <div className="visualizer_strip"><Visualizer /></div>
 
       <div className="m_now_playing">
         <div className="m_song_name">{song?.name ?? "Nothing playing"}</div>

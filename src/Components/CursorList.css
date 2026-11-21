@@ -1,13 +1,3 @@
-.cursor{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--list-accent-color);
-  transition: transform 0.05s ease-out;
-}
-
 .cursor_list_wrapper {
     position: relative;
     display: flex;
@@ -26,38 +16,62 @@
     scrollbar-color: var(--list-accent-color) transparent;
 }
 
-.cursor_list_inner{
+.cursor_list_inner {
     position: relative;
     width: 100%;
 }
 
-.cursor_list{
+.cursor_list {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    margin-top: 0rem;
     width: 100%;
 }
 
-.new_label_input{
+/* the "New name:" row: always takes its space (hidden when idle), so nothing jumps */
+.new_label {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.new_label_input {
     height: 1rem;
     width: 12rem;
 }
 
-.rendered_item{
-    padding-left: 1.5rem;
+/* a row = the item's content + the ⋮ button on the far right */
+.cursor_row {
+    position: relative;   /* anchor for the drag handle */
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    width: 100%;
+    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-.cursor_list .rendered_item {
-    cursor: pointer;
-    position: relative;   /* anchor for the drag handle */
+/* hover state: a light tint of the text color works on every theme */
+@media (hover: hover) {
+    .cursor_row:hover {
+        background-color: color-mix(in srgb, var(--text-color) 8%, transparent);
+    }
+}
+
+/* the row whose menu is open, or that is being dragged */
+.cursor_row.menu_open,
+.cursor_row.row_dragging {
+    background-color: color-mix(in srgb, var(--list-accent-color) 18%, transparent);
 }
 
 /* drag mode: only the mouse cursor changes, the layout stays exactly the same */
-.drag_mode .cursor_list .rendered_item {
+.drag_mode .cursor_row {
     cursor: grab;
 }
-.is_dragging .cursor_list .rendered_item {
+.is_dragging .cursor_row {
     cursor: grabbing;
 }
 .drag_mode,
@@ -65,21 +79,12 @@
     user-select: none;
 }
 
-/* a row = the item's content + the ⋮ button on the far right */
-.cursor_row {
-    display: flex;
-    align-items: flex-start;   /* the ⋮ sits level with the first line, i.e. the title */
-    align-self: stretch;
-    width: 100%;
-    gap: 0.5rem;
-}
-
 .cursor_row_content {
     flex: 1;
     min-width: 0;
 }
 
-/* keeps row heights identical to before (".playlist_list div" adds a top margin to every div) */
+/* keeps row heights identical (".playlist_list div" adds a top margin to every div) */
 .playlist_list .cursor_row_content {
     margin-top: 0;
 }
@@ -88,7 +93,6 @@
     flex-shrink: 0;
     width: 2rem;
     height: 1.5rem;
-    margin-top: 0.1rem;
     padding: 0;
     border: none;
     box-shadow: none;
@@ -121,8 +125,9 @@
 /* the drag handle takes the ⋮ slot on the right: absolute = takes no space, moves nothing */
 .drag_handle {
     position: absolute;
-    right: 0;
-    top: 0.1rem;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
     width: 2rem;
     height: 1.5rem;
     display: flex;

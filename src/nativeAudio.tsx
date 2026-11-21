@@ -1,8 +1,9 @@
 import { join } from '@tauri-apps/api/path';
-import { getBragiDir } from './storage';
-import { newId, audioMime, Song } from './types_and_functions';
 import { readFile } from '@tauri-apps/plugin-fs';
-import { readTags } from './importSongs';
+import { getBragiDir } from './storage';
+import { newId, audioMime } from './types_and_functions';
+import type { Song } from './types_and_functions';
+import { readTags, saveCover } from './importSongs';
 
 export type DeviceMp3 = { id: string; name: string; artist: string | null; ext: string };
 
@@ -50,13 +51,16 @@ export async function importDeviceMp3(item: DeviceMp3): Promise<Song | null> {
   const id = newId();
   const dest = await join(await getBragiDir(), 'songs', `${id}.${item.ext}`);
   if (!window.BragiNative?.copyMp3(item.id, dest)) return null;
-  // MediaStore's titles are sometimes mis-decoded, so read the tags from the copied file instead
+
+  // MediaStore's titles are sometimes mis-decoded, so read the tags (and the cover) from the copied file
   const bytes = await readFile(dest);
-  const { title, artist } = await readTags(bytes, audioMime(item.ext));
+  const tags = await readTags(bytes, audioMime(item.ext));
+  const cover = tags.picture ? await saveCover(id, tags.picture) : undefined;
   return {
     id,
     path: `${id}.${item.ext}`,
-    name: title ?? item.name,                       // MediaStore name only as a fallback
-    artist: artist ?? item.artist ?? 'Unknown Artist',
+    name: tags.title ?? item.name,
+    artist: tags.artist ?? item.artist ?? 'Unknown Artist',
+    cover,
   };
 }

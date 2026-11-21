@@ -9,13 +9,14 @@ async function getBragiDir() {
 
 async function ensureBragiFolders() {
   const bragiDir = await getBragiDir();
-  const songsDir = await join(bragiDir, 'songs');
-
   if (!(await exists(bragiDir))) {
     await mkdir(bragiDir, { recursive: true });
   }
-  if (!(await exists(songsDir))) {
-    await mkdir(songsDir, { recursive: true });
+  for (const name of ['songs', 'covers']) {
+    const dir = await join(bragiDir, name);
+    if (!(await exists(dir))) {
+      await mkdir(dir, { recursive: true });
+    }
   }
 }
 
