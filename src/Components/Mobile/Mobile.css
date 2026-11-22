@@ -53,16 +53,63 @@
 }
 .m_tab_active { color: var(--playlist-accent-color); border-top-color: var(--playlist-accent-color); }
 
-.m_player { display: flex; flex-direction: column; height: 100%; padding: 1.5rem 1.25rem; }
-.m_now_playing { min-height: 3.5rem; margin: 0.75rem 0 0.5rem; text-align: center; }
+.m_player { display: flex; flex-direction: column; height: 100%; padding: 1rem 1.25rem 0.5rem; }
+
+/* cover + visualizer: one column, as wide as the space allows (capped by the height), centered */
+.m_player .m_art {
+    flex: 1;
+    min-height: 0;
+    width: min(100%, 36vh);
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+}
+.m_player .cover_area {
+    flex: 0 0 auto;
+    container-type: normal;
+}
+.m_player .player_cover {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+/* the visualizer takes all the space left under the cover, at the cover's exact width */
+.m_player .visualizer_strip {
+    flex: 1;
+    height: auto;
+    min-height: 0;
+    margin: 0.75rem 0;
+}
+
+/* all the controls on one line: the buttons shrink to fit the screen width */
+.m_player .controls_row {
+    flex-wrap: nowrap;
+    gap: 0;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    margin-bottom: 1.6rem;
+}
+.m_player .ctrl_btn {
+    flex: 0 1 2.5rem;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    aspect-ratio: 1;
+}
+.m_player .ctrl_play {
+    flex: 0 1 3.25rem;
+    margin: 0;
+}
+.m_player .ctrl_separator {
+    flex-shrink: 0;
+    margin: 0 0.25rem;
+}
+
+.m_now_playing { min-height: 3.5rem; margin: 0.75rem 0 0.5rem; text-align: left; }
 .m_song_name, .m_song_artist { overflow-wrap: anywhere; }
 .m_song_name { color: var(--song-name-accent-color); font-size: 1.5rem; }
 .m_song_artist { color: grey; }
-.m_controls_main { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
-.m_controls_main .app_button { padding: 0.8rem 0; flex: 1; max-width: 4rem; }
-.m_controls_main .m_play { max-width: 5rem; }
-.m_controls_secondary { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 1rem 0 1.5rem; }
-
 .m_settings { padding: 1rem 1.25rem; }
 .m_setting_row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .m_select { min-width: 10rem; border-radius: 4px; font-family: inherit; letter-spacing: inherit; }
@@ -295,3 +342,24 @@
 }
 .m_update_text { flex: 1; min-width: 0; }
 .m_update .app_button { color: var(--text-color); }
+
+.m_dropdown {
+    width: 100%;
+}
+
+/* settings rows with a dropdown: label on top, dropdown at full width below */
+.m_setting_stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+/* no cover: the visualizer uses the full width and sits in the middle of the free space */
+.m_player .m_art_nocover {
+    width: 100%;
+    justify-content: center;
+}
+.m_player .m_art_nocover .visualizer_strip {
+    flex: 0 0 40%;
+    margin: 0;
+}

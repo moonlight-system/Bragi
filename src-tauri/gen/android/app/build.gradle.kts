@@ -22,7 +22,8 @@ android {
     compileSdk = 36
     namespace = "com.lin.bragi"
     defaultConfig {
-        manifestPlaceholders["usesCleartextTraffic"] = "false"
+        // "true": the transfer talks to the computer on the local network over plain HTTP
+        manifestPlaceholders["usesCleartextTraffic"] = "true"
         applicationId = "com.lin.bragi"
         minSdk = 24
         targetSdk = 36

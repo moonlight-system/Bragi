@@ -5,15 +5,17 @@ import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { HomeScreen } from './Components/Screens/HomeScreen';
 import { SettingsScreen } from './Components/Screens/SettingsScreen';
+import { TransferScreen } from './Components/TransferScreen';
 import { ensureBragiFolders, loadPlaylists, savePlaylists, loadSongs, saveSongs, loadPreferences, savePreferences } from './storage';
 import type { Playlist, Song, UserPreferences } from './types_and_functions';
+import type { ImportResult } from './transfer';
 import { usePlayer } from './usePlayer';
 import { isAndroid, newId } from './types_and_functions';
 import { MobileShell } from './Components/Mobile/MobileShell';
 import { applyFont, DEFAULT_FONT, applyFontSize, DEFAULT_FONT_SIZE, applyLetterSpacing, DEFAULT_LETTER_SPACING } from './fonts';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<"HomeScreen" | "SettingsScreen">("HomeScreen");
+  const [currentScreen, setCurrentScreen] = useState<"HomeScreen" | "SettingsScreen" | "TransferScreen">("HomeScreen");
 
   const [viewedPlaylistId, setViewedPlaylistId] = useState<string | null>(null);
 
@@ -180,6 +182,10 @@ function App() {
     setCurrentScreen("SettingsScreen");
   }
 
+  function onSwitchToTransferScreen() {
+    setCurrentScreen("TransferScreen");
+  }
+
   function createPlaylist(name: string) {
     const newPlaylist: Playlist = { id: newId(), name, songIds: [] };
     setPlaylists(prevList => [newPlaylist, ...prevList]);
@@ -226,6 +232,38 @@ function App() {
           : p
       )
     );
+  }
+
+  // the files are already copied: this only adds the records. Nothing existing is replaced.
+  function importTransfer(result: ImportResult) {
+    setSongs(prev => {
+      const known = new Set(prev.map(s => s.id));
+      return [...prev, ...result.songs.filter(s => !known.has(s.id))];
+    });
+
+    setPlaylists(prev => {
+      let next = [...prev];
+      for (const incoming of result.playlists) {
+        const index = next.findIndex(p => p.id === incoming.id);
+        if (index >= 0) {
+          // same playlist as before: add the songs it doesn't have yet, keep its name and order
+          const existing = next[index];
+          const have = new Set(existing.songIds);
+          next[index] = {
+            ...existing,
+            songIds: [...existing.songIds, ...incoming.songIds.filter(id => !have.has(id))],
+            cover: existing.cover ?? incoming.cover,
+          };
+        } else {
+          // a new playlist; if another one already has that name, add a number
+          const names = new Set(next.map(p => p.name.toLowerCase()));
+          let name = incoming.name;
+          for (let n = 2; names.has(name.toLowerCase()); n++) name = `${incoming.name} (${n})`;
+          next = [{ id: incoming.id, name, songIds: [...incoming.songIds], cover: incoming.cover }, ...next];
+        }
+      }
+      return next;
+    });
   }
 
   function renameSong(songToRename: Song, newName: string) {
@@ -310,6 +348,7 @@ function App() {
             removeSong: removeSongFromPlaylist,
             moveSong,
             copySong: copySongToPlaylist,
+            importTransfer,
           }}
           backOnRight={preferences.backOnRight ?? false}
           onBackOnRightChange={setBackOnRight}
@@ -338,6 +377,7 @@ function App() {
           onSetPlaylistCover={setPlaylistCover}
           songs={songs}
           onSwitchToSettingsScreen={onSwitchToSettingsScreen}
+          onSwitchToTransferScreen={onSwitchToTransferScreen}
           onAddSongs={addSongs}
           onRenameSong={renameSong}
           onRenameArtist={renameArtist}
@@ -360,6 +400,14 @@ function App() {
           onFontSizeChange={setFontSize}
           letterSpacing={preferences.letterSpacing ?? DEFAULT_LETTER_SPACING}
           onLetterSpacingChange={setLetterSpacing}
+        />
+      )}
+      {currentScreen == "TransferScreen" && (
+        <TransferScreen
+          playlists={playlists}
+          songs={songs}
+          onImport={importTransfer}
+          onBack={switchToHomeScreen}
         />
       )}
     </div>

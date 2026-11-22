@@ -4,7 +4,7 @@ import { Visualizer } from "../Visualizer";
 import { ProgressBar } from "../ProgressBar";
 import { PressableRow } from "./PressableRow";
 import { CoverBox, SongCover } from "../Cover";
-import { SkipBack, SkipForward, Play, Pause, Repeat1, Shuffle, RotateCcw, RotateCw } from "lucide-react";
+import { PlayerControls } from "../PlayerControls";
 import { VolumeSlider } from "../VolumeSlider";
 
 function MobilePlaylistsScreen({ playlists, onOpen, onMenu }: {
@@ -61,15 +61,19 @@ function MobileSongsScreen({ playlist, songs, playingSongId, onPlay, onMenu }: {
 
 function MobilePlayerScreen({ player }: { player: Player }) {
   const song = player.currentSong;
-  const accent = (on: boolean) => ({ color: on ? "var(--buttons-accent-color)" : "var(--text-color)" });
+  const hasCover = !!song?.cover;
 
   return (
     <div className="m_player">
-      <div className="cover_area">
-        <SongCover file={song?.cover} className="player_cover" />
+      {/* cover + visualizer share this wrapper, so they always have the same width */}
+      <div className={`m_art ${hasCover ? "" : "m_art_nocover"}`}>
+        {hasCover && (
+          <div className="cover_area">
+            <SongCover file={song?.cover} className="player_cover" />
+          </div>
+        )}
+        <div className="visualizer_strip"><Visualizer /></div>
       </div>
-
-      <div className="visualizer_strip"><Visualizer /></div>
 
       <div className="m_now_playing">
         <div className="m_song_name">{song?.name ?? "Nothing playing"}</div>
@@ -78,21 +82,7 @@ function MobilePlayerScreen({ player }: { player: Player }) {
 
       <ProgressBar />
       <VolumeSlider player={player} />
-
-      <div className="m_controls_main">
-        <button className="app_button m_icon_btn" onClick={player.previous}><SkipBack size={24} fill="currentColor" /></button>
-        <button className="app_button m_icon_btn" onClick={() => player.seekBy(-10)}><RotateCcw size={22} /></button>
-        <button className="app_button m_icon_btn m_play" onClick={player.togglePlay}>
-          {player.isPlaying ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" />}
-        </button>
-        <button className="app_button m_icon_btn" onClick={() => player.seekBy(10)}><RotateCw size={22} /></button>
-        <button className="app_button m_icon_btn" onClick={player.next}><SkipForward size={24} fill="currentColor" /></button>
-      </div>
-
-      <div className="m_controls_secondary">
-        <button className="app_button m_icon_btn" style={accent(player.loop)} onClick={player.toggleLoop}><Repeat1 size={22} /></button>
-        <button className="app_button m_icon_btn" style={accent(player.shuffle)} onClick={player.toggleShuffle}><Shuffle size={22} /></button>
-      </div>
+      <PlayerControls player={player} />
     </div>
   );
 }

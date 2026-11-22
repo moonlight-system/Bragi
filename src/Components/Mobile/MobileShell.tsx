@@ -8,13 +8,15 @@ import { MobileSettings } from "./MobileSettings";
 import { MiniPlayer } from "./MiniPlayer";
 import { ActionSheet, TextPrompt } from "./Sheets";
 import type { SheetAction } from "./Sheets";
-import { pickSongs, refreshSongCover } from "../../importSongs";
+import { pickSongs, pickSongCover } from "../../importSongs";
 import { pickCover } from "../../pickCover";
 import { ChevronLeft, Plus, Settings } from "lucide-react";
 import { Mp3Picker } from "./Mp3Picker";
 import { ensureAudioPermission, importDeviceMp3, hasNativeAudio } from "../../nativeAudio";
 import type { DeviceMp3 } from "../../nativeAudio";
 import { UpdateBanner } from "./UpdateBanner";
+import type { ImportResult } from "../../transfer";
+import { TransferScreen } from "../TransferScreen";
 
 export type MobileActions = {
   createPlaylist: (name: string) => void;
@@ -29,6 +31,7 @@ export type MobileActions = {
   removeSong: (song: Song, playlist: Playlist) => void;
   moveSong: (song: Song, playlist: Playlist, direction: "up" | "down") => void;
   copySong: (song: Song, targetPlaylist: Playlist) => void;
+  importTransfer: (result: ImportResult) => void;
 };
 
 // at most one dialog is open at a time
@@ -148,13 +151,13 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
     }
   }
 
-  // for songs imported before covers existed
-  async function reloadCover(song: Song) {
+  // opens the image picker and sets the chosen image as the song's cover
+  async function chooseSongCover(song: Song) {
     try {
-      const cover = await refreshSongCover(song);
+      const cover = await pickSongCover(song);
       if (cover) actions.setSongCover(song, cover);
     } catch (err) {
-      console.error("reload cover failed:", err);
+      console.error("song cover failed:", err);
     }
   }
 
@@ -186,7 +189,7 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
           kind: "prompt", title: "Edit artist", initial: s.artist,
           onSubmit: (artist) => actions.renameArtist(s, artist),
       }) },
-      { label: "Reload cover from file", onPick: () => reloadCover(s) },
+      { label: s.cover ? "Change cover" : "Add cover", onPick: () => chooseSongCover(s) },
     ];
     if (index > 0) list.push({ label: "Move up", onPick: () => actions.moveSong(s, viewedPlaylist, "up") });
     if (index < last) list.push({ label: "Move down", onPick: () => actions.moveSong(s, viewedPlaylist, "down") });
@@ -199,9 +202,10 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
     nav.screen === "playlists" ? "Bragi" :
     nav.screen === "songs" ? (viewedPlaylist?.name ?? "Songs") :
     nav.screen === "player" ? "Now playing" :
+    nav.screen === "transfer" ? "Transfer" :
     "Settings";
 
-  const showBackButton = nav.screen === "songs" || nav.screen === "player" || nav.screen === "settings";
+  const showBackButton = nav.screen === "songs" || nav.screen === "player" || nav.screen === "settings" || nav.screen === "transfer";
   // the gear is hidden on the player and on settings itself
   const showSettingsButton = nav.screen === "playlists" || nav.screen === "songs";
 
@@ -241,7 +245,21 @@ function MobileShell({ playlists, songs, player, onColorsChange, actions, backOn
             )}
             {nav.screen === "player" && <MobilePlayerScreen player={player} />}
             {nav.screen === "settings" && (
-              <MobileSettings onColorsChange={onColorsChange} backOnRight={backOnRight} onBackOnRightChange={onBackOnRightChange} font={font} onFontChange={onFontChange} fontSize={fontSize} onFontSizeChange={onFontSizeChange} letterSpacing={letterSpacing} onLetterSpacingChange={onLetterSpacingChange} />
+              <MobileSettings
+                onColorsChange={onColorsChange}
+                backOnRight={backOnRight}
+                onBackOnRightChange={onBackOnRightChange}
+                font={font}
+                onFontChange={onFontChange}
+                fontSize={fontSize}
+                onFontSizeChange={onFontSizeChange}
+                letterSpacing={letterSpacing}
+                onLetterSpacingChange={onLetterSpacingChange}
+                onOpenTransfer={() => nav.push("transfer")}
+              />
+            )}
+            {nav.screen === "transfer" && (
+              <TransferScreen playlists={playlists} songs={songs} onImport={actions.importTransfer} />
             )}
           </main>
 

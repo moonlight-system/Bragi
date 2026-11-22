@@ -17,7 +17,7 @@ import { newId, audioExt, audioMime, stripAudioExt, AUDIO_EXTENSIONS } from '../
 import { readTags, saveCover, pickSongCover } from '../../importSongs';
 import { pickCover } from '../../pickCover';
 import { SongCover } from "../Cover";
-import { ArrowDownAZ, Plus, Settings } from "lucide-react";
+import { ArrowDownAZ, ArrowLeftRight, Plus, Settings } from "lucide-react";
 import { VolumeSlider } from "../VolumeSlider";
 import { PlayerControls } from "../PlayerControls";
 
@@ -52,6 +52,7 @@ function HomeScreen({
   onSetPlaylistCover,
   songs,
   onSwitchToSettingsScreen,
+  onSwitchToTransferScreen,
   onAddSongs,
   onRenameSong,
   onRenameArtist,
@@ -71,6 +72,7 @@ function HomeScreen({
   onSetPlaylistCover: (playlist: Playlist, cover: string | null) => void;
   songs: Song[];
   onSwitchToSettingsScreen: () => void;
+  onSwitchToTransferScreen: () => void;
   onAddSongs: (newSongs: Song[], targetPlaylist: Playlist) => void;
   onRenameSong: (song: Song, newName: string) => void;
   onRenameArtist: (song: Song, newArtist: string) => void;
@@ -182,6 +184,8 @@ function HomeScreen({
 
       if (event.key === "s") {
         onSwitchToSettingsScreen();
+      } else if (event.key === "t") {
+        onSwitchToTransferScreen();
       } else if (event.key === "n") {
         event.preventDefault();   // otherwise the "n" would be typed into the name field
         playlistListRef.current?.startCreating();
@@ -192,7 +196,7 @@ function HomeScreen({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isTyping, viewedPlaylist, onSwitchToSettingsScreen, copyingSong]);
+  }, [isTyping, viewedPlaylist, onSwitchToSettingsScreen, onSwitchToTransferScreen, copyingSong]);
 
   const songActions: ExtraAction<Song>[] = [];
   if (otherPlaylists.length > 0) {
@@ -204,16 +208,28 @@ function HomeScreen({
     <div className="home_screen_container">
       <div className="bragi_title">
         <span>Bragi</span>
-        <button
-          className="title_settings_button"
-          tabIndex={-1}
-          title="Settings (s)"
-          aria-label="Settings"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={onSwitchToSettingsScreen}
-        >
-          <Settings size={28} strokeWidth={2} />
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button
+            className="title_settings_button"
+            tabIndex={-1}
+            title="Transfer (t)"
+            aria-label="Transfer"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onSwitchToTransferScreen}
+          >
+            <ArrowLeftRight size={28} strokeWidth={2} />
+          </button>
+          <button
+            className="title_settings_button"
+            tabIndex={-1}
+            title="Settings (s)"
+            aria-label="Settings"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onSwitchToSettingsScreen}
+          >
+            <Settings size={28} strokeWidth={2} />
+          </button>
+        </div>
       </div>
 
       <div className="horizontal_panels">
@@ -259,6 +275,7 @@ function HomeScreen({
             <div className="keybind_label">Right-click or ⋮: options</div>
             <div className="keybind_label">Shift + drag: move playlists</div>
             <div className="keybind_label">n: create playlist</div>
+            <div className="keybind_label">t: transfer</div>
             <div className="keybind_label">s: settings</div>
           </div>
         </div>

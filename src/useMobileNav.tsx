@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export type MobileScreen = "playlists" | "songs" | "player" | "settings";
+export type MobileScreen = "playlists" | "songs" | "player" | "settings" | "transfer";
 
 export function useMobileNav() {
   const [stack, setStack] = useState<MobileScreen[]>(["playlists"]);

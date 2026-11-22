@@ -1,0 +1,193 @@
+.tr_mobile {
+    padding: 1rem 1.25rem;
+}
+
+.tr_body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tr_note {
+    margin: 0;
+    font-size: 0.95rem;
+    color: grey;
+}
+
+/* the buttons that start something */
+.tr_primary {
+    align-self: flex-start;
+    border-radius: 4px;
+    background-color: var(--button-color);
+    color: var(--tertiary-bg-color);
+}
+@media (hover: hover) {
+    .tr_primary:hover {
+        background-color: color-mix(in srgb, var(--button-color) 85%, black);
+    }
+}
+.tr_primary:active {
+    background-color: color-mix(in srgb, var(--button-color) 85%, black);
+}
+.app_button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+.tr_actions,
+.tr_choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.tr_small {
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* desktop: the address and the code to type on the phone */
+.tr_pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.tr_pair_item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    background-color: var(--secondary-bg-color);
+}
+.tr_pair_label {
+    font-size: 0.85rem;
+    color: grey;
+}
+.tr_pair_value {
+    font-size: 1.8rem;
+    color: var(--settings-side-accent-color);
+    user-select: all;
+}
+
+/* phone: connection form */
+.tr_field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.tr_field_label {
+    font-size: 0.9rem;
+    color: grey;
+}
+.tr_input {
+    width: 100%;
+    border-radius: 4px;
+    letter-spacing: inherit;
+    background-color: var(--tertiary-bg-color);
+}
+.tr_connected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--settings-side-accent-color);
+}
+
+/* playlists and songs */
+.tr_list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.tr_list_tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.tr_count {
+    flex: 1;
+    color: grey;
+}
+
+.tr_group_row,
+.tr_song_row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+}
+.tr_song_row {
+    padding-left: 2.75rem;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .tr_group_row:hover,
+    .tr_song_row:hover {
+        background-color: color-mix(in srgb, var(--text-color) 8%, transparent);
+    }
+}
+
+.tr_check {
+    flex-shrink: 0;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin: 0;
+    accent-color: var(--playlist-accent-color);
+}
+
+.tr_group_name {
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.tr_group_count {
+    flex-shrink: 0;
+    color: grey;
+}
+.tr_chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0.2rem;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--text-color);
+}
+
+.tr_song_name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.tr_song_artist {
+    flex-shrink: 1;
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: grey;
+    font-size: 0.9rem;
+}
+
+/* result of a transfer */
+.tr_message {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    border-left: 0.2rem solid var(--playlist-accent-color);
+    background-color: color-mix(in srgb, var(--text-color) 8%, transparent);
+}
+.tr_message_error {
+    border-left-color: #ff4848;
+}

@@ -476,4 +476,4 @@ function SettingsScreen({ onswitchToHomeScreen, onColorsChange, showKeybinds, on
     );
 }
 
-export { SettingsScreen, THEME_PRESETS };
+export { SettingsScreen, THEME_PRESETS, THEME_OPTIONS };
