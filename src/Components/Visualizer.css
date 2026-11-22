@@ -1,20 +1,21 @@
+/* the canvas fills whatever box it is placed in (that box must be position: relative) */
+.visualizer_area,
+.visualizer_strip {
+    position: relative;
+}
+
 .visualizer_canvas {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;              /* keeps the canvas's own aspect ratio */
+    height: 100%;
     image-rendering: pixelated; /* crisp blocks instead of blurry scaling */
 }
 
-/* compact strip under the cover: fixed height, the canvas keeps its proportions */
+/* compact strip under the cover on mobile: fixed height */
 .visualizer_strip {
-    display: flex;
-    justify-content: center;
     flex-shrink: 0;
     height: 4rem;
     margin-top: 0.75rem;
-}
-.visualizer_strip .visualizer_canvas {
-    width: auto;
-    max-width: 100%;
-    height: 100%;
 }

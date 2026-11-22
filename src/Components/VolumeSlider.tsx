@@ -15,8 +15,13 @@ function VolumeSlider({ player }: { player: Player }) {
 
   return (
     <div className="volume_row">
-      <button className="app_button volume_button" onMouseDown={(e) => e.preventDefault()} onClick={toggleMute}>
-        <Icon size={24} strokeWidth={3} />
+      <button
+        className="volume_button"
+        title={v === 0 ? "Unmute" : "Mute"}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={toggleMute}
+      >
+        <Icon size={24} strokeWidth={2.5} />
       </button>
       <input
         type="range"
@@ -31,6 +36,7 @@ function VolumeSlider({ player }: { player: Player }) {
         // a focused <input> would swallow the Space shortcut (App.tsx ignores inputs)
         onPointerUp={(e) => e.currentTarget.blur()}
       />
+      <span className="volume_percent">{Math.round(v * 100)}%</span>
     </div>
   );
 }

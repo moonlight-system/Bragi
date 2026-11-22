@@ -1,3 +1,4 @@
+/* same columns as the progress bar above it: icon under the elapsed time, percentage under the duration */
 .volume_row {
     display: flex;
     align-items: center;
@@ -5,7 +6,34 @@
     margin-top: 1rem;
 }
 
-.volume_button { padding: 0.3rem 0.6rem; }
+.volume_button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+    background: transparent;
+    color: var(--text-color);
+}
+@media (hover: hover) {
+    .volume_button:hover {
+        background-color: color-mix(in srgb, var(--text-color) 12%, transparent);
+    }
+}
+.volume_button:active {
+    background-color: color-mix(in srgb, var(--text-color) 20%, transparent);
+}
+
+.volume_percent {
+    flex-shrink: 0;
+    min-width: 3rem;
+    text-align: center;
+}
 
 .volume_slider {
     flex: 1;

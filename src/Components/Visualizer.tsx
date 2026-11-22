@@ -1,12 +1,12 @@
 import "./Visualizer.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getAnalyser } from "../usePlayer";
 import { getCssVariable } from "../types_and_functions";
 
 // --- tuning knobs (all sizes are in canvas pixels, not screen pixels) ---
 const BAR_WIDTH = 6;
 const BAR_GAP = 2;
-const CANVAS_HEIGHT = 64;
+const MIN_HEIGHT = 16;      // the canvas never gets shorter than this
 const SEGMENT_HEIGHT = 4;   // each bar is a stack of blocks this tall
 const SEGMENT_GAP = 1;      // set to 0 for solid bars
 const MIN_FREQ = 50;        // Hz: left edge of the first bar
@@ -26,8 +26,27 @@ function computeBinEdges(analyser: AnalyserNode, barCount: number): number[] {
   return edges;
 }
 
+// The canvas fills its parent (which must be position: relative). Its drawing width is fixed;
+// its drawing height follows the parent's aspect ratio, so the blocks are never stretched
+// and a taller parent simply gets more rows of blocks.
 function Visualizer({ barCount = 32 }: { barCount?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasWidth = barCount * (BAR_WIDTH + BAR_GAP) - BAR_GAP;
+  const [canvasHeight, setCanvasHeight] = useState(64);
+
+  // follow the size of the space we are given
+  useEffect(() => {
+    const parent = canvasRef.current?.parentElement;
+    if (!parent) return;
+
+    const observer = new ResizeObserver(() => {
+      const { width, height } = parent.getBoundingClientRect();
+      if (width <= 0 || height <= 0) return;
+      setCanvasHeight(Math.max(MIN_HEIGHT, Math.round(canvasWidth * height / width)));
+    });
+    observer.observe(parent);
+    return () => observer.disconnect();
+  }, [canvasWidth]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -36,7 +55,6 @@ function Visualizer({ barCount = 32 }: { barCount?: number }) {
 
     // read once: changing the theme happens in Settings, which unmounts this component
     const color = getCssVariable("--visualizer-accent-color");
-    const segmentCount = Math.floor(CANVAS_HEIGHT / SEGMENT_HEIGHT);
 
     let data = new Uint8Array(0);   // reused every frame, never reallocated
     let edges: number[] = [];
@@ -55,6 +73,10 @@ function Visualizer({ barCount = 32 }: { barCount?: number }) {
       }
       analyser.getByteFrequencyData(data); // fills `data` with 0–255 per bin
 
+      // read every frame: the height changes when the panel is resized
+      const height = canvas.height;
+      const segmentCount = Math.floor(height / SEGMENT_HEIGHT);
+
       g.fillStyle = color;
       for (let bar = 0; bar < barCount; bar++) {
         // loudest bin inside this bar's frequency range
@@ -71,7 +93,7 @@ function Visualizer({ barCount = 32 }: { barCount?: number }) {
 
         const x = bar * (BAR_WIDTH + BAR_GAP);
         for (let s = 0; s < litSegments; s++) {
-          const y = CANVAS_HEIGHT - (s + 1) * SEGMENT_HEIGHT;
+          const y = height - (s + 1) * SEGMENT_HEIGHT;
           g.fillRect(x, y, BAR_WIDTH, SEGMENT_HEIGHT - SEGMENT_GAP);
         }
       }
@@ -85,8 +107,8 @@ function Visualizer({ barCount = 32 }: { barCount?: number }) {
     <canvas
       ref={canvasRef}
       className="visualizer_canvas"
-      width={barCount * (BAR_WIDTH + BAR_GAP) - BAR_GAP}
-      height={CANVAS_HEIGHT}
+      width={canvasWidth}
+      height={canvasHeight}
     />
   );
 }

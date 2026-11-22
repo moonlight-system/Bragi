@@ -26,8 +26,10 @@ export async function readTags(bytes: Uint8Array, mimeType: string): Promise<Tag
   }
 }
 
-// crops the picture to a centered square, shrinks it, saves it as covers/<id>.jpg; returns the file name
-export async function saveCover(id: string, picture: Picture): Promise<string | undefined> {
+// crops the picture to a centered square, shrinks it, saves it in covers/; returns the file name.
+// unique = true gives the file a new name each time (needed when replacing a cover, because
+// the app caches cover images by file name)
+export async function saveCover(id: string, picture: Picture, unique = false): Promise<string | undefined> {
   try {
     const bitmap = await createImageBitmap(new Blob([new Uint8Array(picture.data)], { type: picture.format }));
     const side = Math.min(bitmap.width, bitmap.height);
@@ -45,13 +47,32 @@ export async function saveCover(id: string, picture: Picture): Promise<string | 
     const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
     if (!blob) return undefined;
 
-    const file = `${id}.jpg`;
+    const file = unique ? `${id}-${Date.now()}.jpg` : `${id}.jpg`;
     await writeFile(await join(await getBragiDir(), 'covers', file), new Uint8Array(await blob.arrayBuffer()));
     return file;
   } catch (err) {
     console.error('could not save cover:', err);
     return undefined;
   }
+}
+
+// opens the system image picker and saves the chosen image as the song's cover;
+// returns the new file name, or undefined if the user cancelled
+export async function pickSongCover(song: Song): Promise<string | undefined> {
+  // must be created and clicked synchronously, inside the click that triggered it
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+
+  const file = await new Promise<File | null>((resolve) => {
+    input.addEventListener('change', () => resolve(input.files?.[0] ?? null));
+    input.addEventListener('cancel', () => resolve(null));
+    input.click();
+  });
+  if (!file) return undefined;
+
+  const data = new Uint8Array(await file.arrayBuffer());
+  return saveCover(song.id, { data, format: file.type || 'image/jpeg' }, true);
 }
 
 // for songs imported before covers existed: reads the file again and extracts its cover

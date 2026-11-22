@@ -14,11 +14,12 @@ import { EditableLabel } from "../EditableLabel";
 import type { ItemEditor, CursorListHandle, ExtraAction } from "../CursorList";
 import { readFile, writeFile } from '@tauri-apps/plugin-fs';
 import { newId, audioExt, audioMime, stripAudioExt, AUDIO_EXTENSIONS } from '../../types_and_functions';
-import { readTags, saveCover, refreshSongCover } from '../../importSongs';
+import { readTags, saveCover, pickSongCover } from '../../importSongs';
 import { pickCover } from '../../pickCover';
 import { SongCover } from "../Cover";
-import { ArrowDownAZ, Pause, Play, Plus, Repeat1, RotateCcw, RotateCw, Settings, Shuffle, SkipBack, SkipForward } from "lucide-react";
+import { ArrowDownAZ, Plus, Settings } from "lucide-react";
 import { VolumeSlider } from "../VolumeSlider";
+import { PlayerControls } from "../PlayerControls";
 
 function SongListItem({ song, playing, editor }: {
   song: Song;
@@ -161,12 +162,12 @@ function HomeScreen({
     }
   }
 
-  async function reloadCover(song: Song) {
+  async function chooseSongCover(song: Song) {
     try {
-      const cover = await refreshSongCover(song);
+      const cover = await pickSongCover(song);
       if (cover) onSetSongCover(song, cover);
     } catch (err) {
-      console.error("reload cover failed:", err);
+      console.error("song cover failed:", err);
     }
   }
 
@@ -197,7 +198,7 @@ function HomeScreen({
   if (otherPlaylists.length > 0) {
     songActions.push({ label: "Add to another playlist", onSelect: (song) => setCopyingSong(song) });
   }
-  songActions.push({ label: "Reload cover from file", onSelect: reloadCover });
+  songActions.push({ label: (s) => (s.cover ? "Change cover" : "Add cover"), onSelect: chooseSongCover });
 
   return (
     <div className="home_screen_container">
@@ -276,9 +277,43 @@ function HomeScreen({
 
               {playlistSongs.length === 0 ? (
                 <div className="panel_placeholder">No songs yet</div>
+              ) : visibleSongs.length === 0 ? (
+                <div className="panel_placeholder">No match</div>
               ) : (
-                <>
-                  <div className="song_panel_tools">
+                <CursorList
+                  className="playlist_list"
+                  items={visibleSongs}
+                  keyExtractor={(s) => s.id}
+                  renderItem={(s, editor) => (
+                    <SongListItem song={s} playing={s.id === playingSongId} editor={editor} />
+                  )}
+                  onModeChange={setSongsMode}
+                  editableFields={[
+                    { id: "name", label: "Rename song", onCommit: onRenameSong },
+                    { id: "artist", label: "Rename artist", onCommit: onRenameArtist },
+                  ]}
+                  deleteLabel="Delete song"
+                  extraActions={songActions}
+                  onDelete={(song) => onRemoveSong(song, viewedPlaylist)}
+                  onReorder={canReorder ? (song, direction) => onMoveSong(song, viewedPlaylist, direction) : undefined}
+                  onActivate={(song) => player.playSong(song, viewedPlaylist, orderedSongs.map(s => s.id))}
+                />
+              )}
+
+              <div className="song_panel_footer">
+                <button
+                  className="add_button"
+                  tabIndex={-1}
+                  title="Add songs (a)"
+                  aria-label="Add songs"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => importSongs()}
+                >
+                  <Plus strokeWidth={4}/>
+                </button>
+
+                {playlistSongs.length > 0 && (
+                  <>
                     <input
                       className="app_input song_search"
                       type="text"
@@ -301,43 +336,9 @@ function HomeScreen({
                     >
                       <ArrowDownAZ size={22} strokeWidth={2.5} />
                     </button>
-                  </div>
-
-                  {visibleSongs.length === 0 ? (
-                    <div className="panel_placeholder">No match</div>
-                  ) : (
-                    <CursorList
-                      className="playlist_list"
-                      items={visibleSongs}
-                      keyExtractor={(s) => s.id}
-                      renderItem={(s, editor) => (
-                        <SongListItem song={s} playing={s.id === playingSongId} editor={editor} />
-                      )}
-                      onModeChange={setSongsMode}
-                      editableFields={[
-                        { id: "name", label: "Rename song", onCommit: onRenameSong },
-                        { id: "artist", label: "Rename artist", onCommit: onRenameArtist },
-                      ]}
-                      deleteLabel="Delete song"
-                      extraActions={songActions}
-                      onDelete={(song) => onRemoveSong(song, viewedPlaylist)}
-                      onReorder={canReorder ? (song, direction) => onMoveSong(song, viewedPlaylist, direction) : undefined}
-                      onActivate={(song) => player.playSong(song, viewedPlaylist, orderedSongs.map(s => s.id))}
-                    />
-                  )}
-                </>
-              )}
-
-              <button
-                className="add_button"
-                tabIndex={-1}
-                title="Add songs (a)"
-                aria-label="Add songs"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => importSongs()}
-              >
-                <Plus strokeWidth={4}/>
-              </button>
+                  </>
+                )}
+              </div>
 
               <div className="keybinds_footer">
                 <div className="keybind_label">Click: play song</div>
@@ -350,59 +351,28 @@ function HomeScreen({
         </div>)}
 
         {player.hasPlayed && (<div className="panel main_player">
-          <div className="cover_area">
-            <SongCover file={player.currentSong?.cover} className="player_cover" />
-          </div>
-
-          <div className="visualizer_strip">
+          <div className="visualizer_area">
             <Visualizer />
           </div>
 
-          <div className="player_group">
-            <div className="now_playing">
-              {player.currentSong ? (
-                <>
-                  <div className="player_song_name">{player.currentSong.name}</div>
-                  <div className="player_artist_name">{player.currentSong.artist}</div>
-                </>
-              ) : (
-                <div style={{ color: "grey" }}>Nothing playing</div>
-              )}
-            </div>
+          <div className="player_bottom">
+            <SongCover file={player.currentSong?.cover} className="player_cover_small" />
 
-            <ProgressBar/>
-            <VolumeSlider player={player} />
+            <div className="player_group">
+              <div className="now_playing">
+                {player.currentSong ? (
+                  <>
+                    <div className="player_song_name">{player.currentSong.name}</div>
+                    <div className="player_artist_name">{player.currentSong.artist}</div>
+                  </>
+                ) : (
+                  <div style={{ color: "grey" }}>Nothing playing</div>
+                )}
+              </div>
 
-            <div className="player_controls">
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} onClick={player.previous}>
-                <SkipBack size={30} strokeWidth={3} />
-              </button>
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} onClick={() => player.seekBy(-10)}>
-                <RotateCcw size={30} strokeWidth={3} />
-              </button>
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} onClick={player.togglePlay}>
-                {player.isPlaying ? <Pause size={30} strokeWidth={3} /> : <Play size={30} strokeWidth={3} />}
-              </button>
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} onClick={() => player.seekBy(10)}>
-                <RotateCw size={30} strokeWidth={3} />
-              </button>
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} onClick={player.next}>
-                <SkipForward size={30} strokeWidth={3} />
-              </button>
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} style={{ color: player.loop ? "var(--buttons-accent-color)" : "var(--text-color)" }} onClick={player.toggleLoop}>
-                <Repeat1 size={30} strokeWidth={3} />
-              </button>
-
-              <button className="app_button" onMouseDown={(e) => e.preventDefault()} style={{ color: player.shuffle ? "var(--buttons-accent-color)" : "var(--text-color)" }} onClick={player.toggleShuffle}>
-                <Shuffle size={30} strokeWidth={3} />
-              </button>
-
+              <ProgressBar/>
+              <VolumeSlider player={player} />
+              <PlayerControls player={player} />
             </div>
           </div>
 
